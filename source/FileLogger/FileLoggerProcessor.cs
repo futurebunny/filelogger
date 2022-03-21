@@ -346,7 +346,16 @@ namespace Karambolo.Extensions.Logging.File
                 currentFileSize = fileInfo.Length;
             }
             else
-                currentFileSize = logFile.Size.Value;
+            {
+                if ((logFile.IsOpen) && (null != logFile.Size))
+                {
+                    currentFileSize = logFile.Size.Value;
+                }
+                else
+                {
+                    currentFileSize = 0;
+                }
+            }
 
             long expectedFileSize = currentFileSize > 0 ? currentFileSize : logFile.Encoding.GetPreamble().Length;
             expectedFileSize += logFile.Encoding.GetByteCount(entry.Text);
@@ -462,6 +471,8 @@ namespace Karambolo.Extensions.Logging.File
                             {
                                 if (logFile.ShouldEnsurePreamble)
                                     await logFile.EnsurePreambleAsync(cancellationToken).ConfigureAwait(false);
+
+                                // https://docs.microsoft.com/en-us/dotnet/api/system.io.file.writeallbytesasync?view=net-6.0
 
                                 await logFile.WriteBytesAsync(logFile.Encoding.GetBytes(entry.Text), cancellationToken).ConfigureAwait(false);
 

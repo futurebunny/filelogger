@@ -43,11 +43,18 @@ namespace Karambolo.Extensions.Logging.File
         public Task<bool> EnsureDirAsync(IFileInfo fileInfo, CancellationToken cancellationToken = default)
         {
             var dirPath = Path.GetDirectoryName(fileInfo.PhysicalPath);
-            if (Directory.Exists(dirPath))
-                return Task.FromResult(false);
+            if (null != dirPath)
+            {
+                if (Directory.Exists(dirPath))
+                    return Task.FromResult(false);
 
-            Directory.CreateDirectory(dirPath);
-            return Task.FromResult(true);
+                Directory.CreateDirectory(dirPath);
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
         }
 
         public Stream CreateAppendStream(IFileInfo fileInfo)
