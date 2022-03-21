@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define IRL_INCLUDE_EXTENSIONS 
+#define IRL_SPRINT_3_OR_LATER
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -46,7 +48,18 @@ namespace Karambolo.Extensions.Logging.File
                 DateFormat = fileSettings.DateFormat ?? settings.DateFormat ?? "yyyyMMdd";
                 CounterFormat = fileSettings.CounterFormat ?? settings.CounterFormat;
                 MaxSize = fileSettings.MaxFileSize ?? settings.MaxFileSize ?? 0;
+#if IRL_INCLUDE_EXTENSIONS && IRL_SPRINT_3_OR_LATER
+                UseTickCount = fileSettings.UseTickCount ?? false;
 
+                TickCountFormat = fileSettings.TickCountFormat ?? "X8";
+
+                TickCount = fileSettings.TickCount ?? DateTime.UtcNow.Ticks;
+
+                if (TickCount > DateTime.UtcNow.Ticks)
+                {
+                    TickCount = DateTime.UtcNow.Ticks;
+                }
+#endif
                 Queue = processor.CreateLogFileQueue(fileSettings, settings);
 
                 // important: closure must pick up the current token!
@@ -67,6 +80,11 @@ namespace Karambolo.Extensions.Logging.File
             public Encoding Encoding { get; }
             public string DateFormat { get; }
             public string CounterFormat { get; }
+#if true || SPRINT_3
+            public bool UseTickCount { get; }
+            public long TickCount { get; }
+            public string TickCountFormat { get; }
+#endif
             public long MaxSize { get; }
 
             public Channel<FileLogEntry> Queue { get; }
@@ -132,6 +150,9 @@ namespace Karambolo.Extensions.Logging.File
             string ILogFilePathFormatContext.FormatDate(string inlineFormat) => _processor.GetDate(inlineFormat, _logFile, _logEntry);
             string ILogFilePathFormatContext.FormatCounter(string inlineFormat) => _processor.GetCounter(inlineFormat, _logFile, _logEntry);
 
+#if IRL_INCLUDE_EXTENSIONS && IRL_SPRINT_3_OR_LATER
+            string ILogFilePathFormatContext.FormatTickCount(string inlineFormat) => _processor.GetTickCount(inlineFormat, _logFile, _logEntry);
+#endif
             public string ResolvePlaceholder(Match match)
             {
                 var placeholderName = match.Groups[1].Value;
@@ -149,6 +170,9 @@ namespace Karambolo.Extensions.Logging.File
             {
                 case "date": return context.FormatDate(inlineFormat);
                 case "counter": return context.FormatCounter(inlineFormat);
+#if IRL_INCLUDE_EXTENSIONS && IRL_SPRINT_3_OR_LATER
+                case "ticks": return context.FormatTickCount(inlineFormat);
+#endif
                 default: return null;
             }
         };
@@ -329,6 +353,34 @@ namespace Karambolo.Extensions.Logging.File
         {
             return logFile.Counter.ToString(inlineFormat ?? logFile.CounterFormat, CultureInfo.InvariantCulture);
         }
+
+#if IRL_INCLUDE_EXTENSIONS && IRL_SPRINT_3_OR_LATER
+        protected virtual string GetTickCount(string inlineFormat, LogFileInfo logFile, FileLogEntry entry)
+        {
+            string szFormattedTickCount = String.Empty;
+            string szFormat = inlineFormat ?? logFile.TickCountFormat;
+            if (!string.IsNullOrEmpty(szFormat))
+            {
+                szFormattedTickCount = logFile.TickCount.ToString(inlineFormat ?? logFile.TickCountFormat, CultureInfo.InvariantCulture);
+            }
+            if (!string.IsNullOrEmpty(szFormattedTickCount))
+            {
+                return szFormattedTickCount;
+            }
+            else
+            {
+                return String.Empty;
+            }
+            //return $"0x{logFile.TickCount.ToString()}";
+            //$"0x{logFile.TickCount.ToString("X8", CultureInfo.InvariantCulture)}";
+            //return logFile.TickCount.ToString("0x8X", CultureInfo.InvariantCulture);
+
+#if false
+            //
+            return $"0x{logFile.TickCount.ToString(inlineFormat ?? logFile.TickCountFormat, CultureInfo.InvariantCulture)}";
+#endif
+        }
+#endif
 
         protected virtual bool CheckFileSize(string filePath, LogFileInfo logFile, FileLogEntry entry)
         {

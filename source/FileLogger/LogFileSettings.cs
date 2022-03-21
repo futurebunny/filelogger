@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define IRL_INCLUDE_EXTENSIONS 
+#define IRL_SPRINT_3_OR_LATER
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,6 +37,11 @@ namespace Karambolo.Extensions.Logging.File
     {
         string Path { get; }
 
+#if IRL_INCLUDE_EXTENSIONS && IRL_SPRINT_3_OR_LATER
+        bool? UseTickCount { get; }
+        long? TickCount { get; }
+        string? TickCountFormat { get; }
+#endif
         LogLevel GetMinLevel(string categoryName);
     }
 
@@ -143,6 +150,12 @@ namespace Karambolo.Extensions.Logging.File
         }
 
         public string Path { get; set; }
+
+#if IRL_INCLUDE_EXTENSIONS && IRL_SPRINT_3_OR_LATER
+        public bool? UseTickCount { get; set; }
+        public long? TickCount { get; set; }
+        public string TickCountFormat { get; set;  }
+#endif
 
         public Dictionary<string, LogLevel> MinLevel { get; set; }
 
