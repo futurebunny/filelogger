@@ -34,7 +34,7 @@ namespace Intemporal.Experimental.Diagnostics.NativeMethods
             internal static int MaxRecursionDepth = 10;
             internal static bool CountTotalCalls = true;
             internal static bool CheckRecursionDepth = true;
-            internal static bool AlwaysUseNativeOutput = true;
+            internal static bool AlwaysUseNativeOutput = false;
             internal static bool? IsDebuggerAttached = null;
 
 
@@ -48,6 +48,7 @@ namespace Intemporal.Experimental.Diagnostics.NativeMethods
                 if (IsDebuggerAttached == null)
                 {
                     IsDebuggerAttached = System.Diagnostics.Debugger.IsAttached;
+                    AlwaysUseNativeOutput = !(bool)IsDebuggerAttached;
                 }
                 return (bool)IsDebuggerAttached;
             }
@@ -86,9 +87,10 @@ namespace Intemporal.Experimental.Diagnostics.NativeMethods
                     else
                     {
 #if DEBUG
-                        System.Diagnostics.Trace.WriteLine(message);
+                        System.Diagnostics.Debug.WriteLine(message);
 #else
-                        NativeWin32.OutputDebugString(message);
+                        System.Diagnostics.Trace.WriteLine(message);
+                        //NativeWin32.OutputDebugString(message);
 #endif
                     }
                 }
