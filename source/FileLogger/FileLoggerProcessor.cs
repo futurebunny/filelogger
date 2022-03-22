@@ -39,13 +39,18 @@ namespace Karambolo.Extensions.Logging.File
 
             public LogFileInfo(FileLoggerProcessor processor, ILogFileSettings fileSettings, IFileLoggerSettings settings)
             {
+#if IRL_INCLUDE_EXTENSIONS
+                DateTime dtCreateLogFile = DateTime.Now;
+                Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.TraceMethodEntry(false, $"Begin Creating Log File at: {dtCreateLogFile.ToUniversalTime()}, equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}]");
+#endif
+
                 BasePath = settings.BasePath ?? string.Empty;
                 PathFormat = fileSettings.Path;
                 PathPlaceholderResolver = GetActualPathPlaceholderResolver(fileSettings.PathPlaceholderResolver ?? settings.PathPlaceholderResolver);
                 FileAppender = settings.FileAppender ?? processor._fallbackFileAppender.Value;
                 AccessMode = fileSettings.FileAccessMode ?? settings.FileAccessMode ?? LogFileAccessMode.Default;
                 Encoding = fileSettings.FileEncoding ?? settings.FileEncoding ?? Encoding.UTF8;
-                DateFormat = fileSettings.DateFormat ?? settings.DateFormat ?? "yyyyMMdd";
+                DateFormat = fileSettings.DateFormat ?? settings.DateFormat ?? "dt<date:yyyy>-<date:MM>-<date:dd>--<date:HH>-<date:mm>-<date:ss>";
                 CounterFormat = fileSettings.CounterFormat ?? settings.CounterFormat;
                 MaxSize = fileSettings.MaxFileSize ?? settings.MaxFileSize ?? 0;
 #if IRL_INCLUDE_EXTENSIONS && IRL_SPRINT_3_OR_LATER
@@ -53,13 +58,12 @@ namespace Karambolo.Extensions.Logging.File
 
                 TickCountFormat = fileSettings.TickCountFormat ?? "X8";
 
-                TickCount = fileSettings.TickCount ?? DateTime.UtcNow.Ticks;
-
-                if (TickCount > DateTime.UtcNow.Ticks)
-                {
-                    TickCount = DateTime.UtcNow.Ticks;
-                }
+                TickCount = dtCreateLogFile.Ticks;
 #endif
+
+                //
+                // This is async, so the actual file creation time will differ from the internal reference time
+                //
                 Queue = processor.CreateLogFileQueue(fileSettings, settings);
 
                 // important: closure must pick up the current token!
@@ -80,7 +84,7 @@ namespace Karambolo.Extensions.Logging.File
             public Encoding Encoding { get; }
             public string DateFormat { get; }
             public string CounterFormat { get; }
-#if true || SPRINT_3
+#if IRL_INCLUDE_EXTENSIONS && IRL_SPRINT_3_OR_LATER
             public bool UseTickCount { get; }
             public long TickCount { get; }
             public string TickCountFormat { get; }
@@ -133,12 +137,21 @@ namespace Karambolo.Extensions.Logging.File
             private readonly FileLoggerProcessor _processor;
             private readonly LogFileInfo _logFile;
             private readonly FileLogEntry _logEntry;
+#if IRL_INCLUDE_EXTENSIONS && IRL_SPRINT_4_OR_LATER
+            private readonly DateTime _logDate;
+#endif
+
 
             public LogFilePathFormatContext(FileLoggerProcessor processor, LogFileInfo logFile, FileLogEntry logEntry)
             {
                 _processor = processor;
                 _logFile = logFile;
                 _logEntry = logEntry;
+#if IRL_INCLUDE_EXTENSIONS && IRL_SPRINT_4_OR_LATER
+                _logDate = DateTime.Now;
+                Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.TraceMethodEntry(false, $"Begin Creating Log File at: {dtCreateLogFile.ToUniversalTime()}, equal to [0x{dtCreateLogFile.Ticks.ToString("8X")}]");
+#endif
+
             }
 
             FileLogEntry ILogFilePathFormatContext.LogEntry => _logEntry;
@@ -166,15 +179,69 @@ namespace Karambolo.Extensions.Logging.File
 
         private static readonly LogFilePathPlaceholderResolver s_defaultPathPlaceholderResolver = (placeholderName, inlineFormat, context) =>
         {
+#if DEBUG
+            try
+            {
+                Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.TraceMethodEntry(false, placeholderName);
+
+                switch (placeholderName)
+                {
+                    case "date":
+                        {
+                            Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.TraceMethodExit(false, "date");
+                            return context.FormatDate(inlineFormat);
+                        }
+#if IRL_INCLUDE_EXTENSIONS && IRL_SPRINT_4_OR_LATER
+                    case "time":
+                        {
+                            Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.TraceMethodExit(false, "time");
+                            return context.FormatDate(inlineFormat);
+                        }
+#endif
+                    case "counter":
+                        {
+                            Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.TraceMethodExit(false, "counter");
+                            return context.FormatCounter(inlineFormat);
+                        }
+#if IRL_INCLUDE_EXTENSIONS && IRL_SPRINT_3_OR_LATER
+                    case "ticks":
+                        {
+                            Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.TraceMethodExit(false, "ticks");
+                            return context.FormatTickCount(inlineFormat);
+                        }
+#endif
+                    default:
+                        {
+                            Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.TraceMethodExit(true, "default");
+                            return null;
+                        }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.WriteLine($"ERROR: Formatting log file path placeholder resulted in an unhandled exception");
+                Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.WriteLine($"EXCEPTION: {ex.Message}");
+                if (null != ex.StackTrace)
+                {
+                    Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.WriteLine(ex.StackTrace.ToString());
+                }
+                Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.TraceMethodExit(true, "EXCEPTION");
+                return null;
+            }
+#else
             switch (placeholderName)
             {
                 case "date": return context.FormatDate(inlineFormat);
+#if IRL_INCLUDE_EXTENSIONS && IRL_SPRINT_4_OR_LATER
+                case "time": return context.FormatDate(inlineFormat);
+#endif
                 case "counter": return context.FormatCounter(inlineFormat);
 #if IRL_INCLUDE_EXTENSIONS && IRL_SPRINT_3_OR_LATER
                 case "ticks": return context.FormatTickCount(inlineFormat);
 #endif
                 default: return null;
             }
+#endif
         };
 
         private static readonly Regex s_pathPlaceholderRegex = new Regex(@"<([_a-zA-Z][_a-zA-Z0-9-]*)(?::\s*([^<>]*[^\s<>]))?>", RegexOptions.Compiled | RegexOptions.CultureInvariant);
@@ -300,6 +367,10 @@ namespace Karambolo.Extensions.Logging.File
 
         protected virtual LogFileInfo CreateLogFile(ILogFileSettings fileSettings, IFileLoggerSettings settings)
         {
+#if IRL_INCLUDE_EXTENSIONS
+            DateTime dtCreateLogFile = DateTime.Now;
+            Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.TraceMethodEntry(false, $"Begin Creating Log File at: {dtCreateLogFile.ToUniversalTime()}, equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}]");
+#endif
             return new LogFileInfo(this, fileSettings, settings);
         }
 
@@ -346,39 +417,137 @@ namespace Karambolo.Extensions.Logging.File
 
         protected virtual string GetDate(string inlineFormat, LogFileInfo logFile, FileLogEntry entry)
         {
-            return entry.Timestamp.ToLocalTime().ToString(inlineFormat ?? logFile.DateFormat, CultureInfo.InvariantCulture);
+            string? szValue = null;
+
+#if DEBUG
+            try
+            {
+                Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.TraceMethodEntry(false, null);
+
+                string szFormat = inlineFormat ?? logFile.DateFormat;
+
+                if (!String.IsNullOrEmpty(szFormat))
+                {
+                    Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.WriteLine($"String Format Fragment [{szFormat}]");
+                }
+
+                szValue = entry.Timestamp.ToLocalTime().ToString(inlineFormat ?? logFile.DateFormat, CultureInfo.InvariantCulture);
+
+                if (!String.IsNullOrEmpty(szValue))
+                {
+                    Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.WriteLine($"String Format Result Fragment [{szValue}]");
+                }
+                return szValue;
+            }
+            catch (System.Exception ex)
+            {
+                Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.WriteLine($"ERROR: Formatting request resulted in a normally unhandled exception");
+                Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.WriteLine($"EXCEPTION: {ex.Message}");
+                if (null != ex.StackTrace)
+                {
+                    Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.WriteLine(ex.StackTrace.ToString());
+                }
+                szValue = String.Empty;
+            }
+            finally
+            {
+                Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.TraceMethodExit((null != szValue), szValue ?? String.Empty);
+            }
+#else
+            //return  entry.Timestamp.ToLocalTime().ToString(inlineFormat ?? logFile.DateFormat, CultureInfo.InvariantCulture);
+            szValue = entry.Timestamp.ToLocalTime().ToString(inlineFormat ?? logFile.DateFormat, CultureInfo.InvariantCulture);
+#endif
+            return (string)szValue;
         }
 
         protected virtual string GetCounter(string inlineFormat, LogFileInfo logFile, FileLogEntry entry)
         {
-            return logFile.Counter.ToString(inlineFormat ?? logFile.CounterFormat, CultureInfo.InvariantCulture);
+            string? szValue = null;
+
+#if DEBUG
+            try
+            {
+                Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.TraceMethodEntry(false, null);
+
+                string szFormat = inlineFormat ?? logFile.CounterFormat;
+
+                if (!String.IsNullOrEmpty(szFormat))
+                {
+                    Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.WriteLine($"Format Format Fragment [{szFormat}]");
+                }
+
+                szValue = logFile.Counter.ToString(inlineFormat ?? logFile.CounterFormat, CultureInfo.InvariantCulture);
+
+                if (!String.IsNullOrEmpty(szValue))
+                {
+                    Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.WriteLine($"String Format Result Fragment [{szValue}]");
+                }
+                return szValue;
+            }
+            catch (System.Exception ex)
+            {
+                Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.WriteLine($"ERROR: Formatting request resulted in a normally unhandled exception");
+                Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.WriteLine($"EXCEPTION: {ex.Message}");
+                if (null != ex.StackTrace)
+                {
+                    Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.WriteLine(ex.StackTrace.ToString());
+                }
+                szValue = String.Empty;
+            }
+            finally
+            {
+                Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.TraceMethodExit((null != szValue), szValue ?? String.Empty);
+            }
+#else
+            //return  logFile.Counter.ToString(inlineFormat ?? logFile.CounterFormat, CultureInfo.InvariantCulture);
+            szValue = logFile.Counter.ToString(inlineFormat ?? logFile.CounterFormat, CultureInfo.InvariantCulture);
+#endif
+            return (string)szValue;
         }
 
 #if IRL_INCLUDE_EXTENSIONS && IRL_SPRINT_3_OR_LATER
         protected virtual string GetTickCount(string inlineFormat, LogFileInfo logFile, FileLogEntry entry)
         {
-            string szFormattedTickCount = String.Empty;
-            string szFormat = inlineFormat ?? logFile.TickCountFormat;
-            if (!string.IsNullOrEmpty(szFormat))
+            string? szValue = null;
+#if DEBUG
+            try
             {
-                szFormattedTickCount = logFile.TickCount.ToString(inlineFormat ?? logFile.TickCountFormat, CultureInfo.InvariantCulture);
-            }
-            if (!string.IsNullOrEmpty(szFormattedTickCount))
-            {
-                return szFormattedTickCount;
-            }
-            else
-            {
-                return String.Empty;
-            }
-            //return $"0x{logFile.TickCount.ToString()}";
-            //$"0x{logFile.TickCount.ToString("X8", CultureInfo.InvariantCulture)}";
-            //return logFile.TickCount.ToString("0x8X", CultureInfo.InvariantCulture);
+                Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.TraceMethodEntry(false, null);
 
-#if false
-            //
-            return $"0x{logFile.TickCount.ToString(inlineFormat ?? logFile.TickCountFormat, CultureInfo.InvariantCulture)}";
+                string szFormat = inlineFormat ?? logFile.TickCountFormat;
+
+                if (!String.IsNullOrEmpty(szFormat))
+                {
+                    Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.WriteLine($"Format Format Fragment [{szFormat}]");
+                }
+
+                szValue = logFile.TickCount.ToString(inlineFormat ?? logFile.TickCountFormat, CultureInfo.InvariantCulture);
+
+                if (!String.IsNullOrEmpty(szValue))
+                {
+                    Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.WriteLine($"String Format Result Fragment [{szValue}]");
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.WriteLine($"ERROR: Formatting request resulted in a normally unhandled exception");
+                Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.WriteLine($"EXCEPTION: {ex.Message}");
+                if (null != ex.StackTrace)
+                {
+                    Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.WriteLine(ex.StackTrace.ToString());
+                }
+                szValue = String.Empty;
+            }
+            finally
+            {
+                Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.TraceMethodExit((null != szValue), szValue ?? String.Empty);
+            }
+#else
+            //return logFile.TickCount.ToString(inlineFormat ?? logFile.TickCountFormat, CultureInfo.InvariantCulture);
+            szValue = logFile.TickCount.ToString(inlineFormat ?? logFile.TickCountFormat, CultureInfo.InvariantCulture);
 #endif
+            return (string)szValue;
+
         }
 #endif
 

@@ -30,6 +30,9 @@ namespace Karambolo.Extensions.Logging.File
         IFileLogEntryTextBuilder TextBuilder { get; }
         bool? IncludeScopes { get; }
         int? MaxQueueSize { get; }
+#if IRL_INCLUDE_EXTENSIONS && IRL_SPRINT_4_OR_LATER
+        DateTime? BaseFileDate { get; }
+#endif
         LogFilePathPlaceholderResolver PathPlaceholderResolver { get; }
     }
 
