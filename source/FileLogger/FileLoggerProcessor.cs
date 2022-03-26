@@ -12,6 +12,10 @@ using System.Threading.Channels;
 using System.Threading.Tasks;
 using Microsoft.Extensions.FileProviders;
 
+#if IRL_INCLUDE_EXTENSIONS
+using Intemporal.Experimental.Diagnostics.Logging;
+#endif
+
 namespace Karambolo.Extensions.Logging.File
 {
     public interface IFileLoggerProcessor : IDisposable

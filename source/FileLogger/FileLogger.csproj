@@ -31,4 +31,9 @@
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="6.0.0" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Experimental\JsonExperiments\Intemporal.Experimental.Diagnostics.Logging\Intemporal.Experimental.Diagnostics.Logging.csproj" />
+  </ItemGroup>
+
 </Project>

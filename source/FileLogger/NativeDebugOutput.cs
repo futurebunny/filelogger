@@ -1,4 +1,5 @@
-﻿#undef USE_INTEMPORAL_SYSTEM
+﻿#if false || INCLUDE_LOW_LEVEL_DEBUG_TRACING
+#undef USE_INTEMPORAL_SYSTEM
 #define USE_INTEMPORAL_EXPERIMENTAL
 using System;
 using System.Collections.Generic;
@@ -190,3 +191,4 @@ namespace Intemporal.Experimental.Diagnostics.NativeMethods
 
     }
 }
+#endif
