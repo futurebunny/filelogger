@@ -1,4 +1,5 @@
-﻿#if false || INCLUDE_LOW_LEVEL_DEBUG_TRACING
+﻿#if false || INCLUDE_FOR_CURRENT_PROJECT
+#if false || INCLUDE_LOW_LEVEL_DEBUG_TRACING
 #undef USE_INTEMPORAL_SYSTEM
 #define USE_INTEMPORAL_EXPERIMENTAL
 using System;
@@ -191,4 +192,84 @@ namespace Intemporal.Experimental.Diagnostics.NativeMethods
 
     }
 }
+
+#else
+#undef USE_INTEMPORAL_SYSTEM
+#define USE_INTEMPORAL_EXPERIMENTAL
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+
+#if USE_INTEMPORAL_SYSTEM
+//namespace Intemporal.System.Diagnostix
+namespace Intemporal.Experimental.Diagnostics.Logging
+#elif USE_INTEMPORAL_EXPERIMENTAL
+namespace Intemporal.Experimental.Diagnostics.NativeMethods
+#endif
+{
+    public class NativeWin32
+    {
+#if true || USE_NATIVE
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+        public static extern void OutputDebugString(string message);
+#else
+        private static int m_totalCalls = 0;
+        private static int m_recursionCount = 0;
+
+        public static void OutputDebugString(string message)
+        {
+            int count = Interlocked.Increment(ref m_recursionCount);
+
+            int totalCalls = Interlocked.Increment(ref m_totalCalls);
+
+            if (count > 10)
+            {
+                //Intemporal.Experimental.Diagnostics.NativeMethods.NativeWin32.OutputDebugString($"TRACE: {nameof(TraceListenerToLogger)}.WriteLine(string?) with Instance {iHashCode} has {count} recursions");
+                throw new InvalidOperationException($"TRACE: {nameof(NativeWin32)}.OutputDebugString(string?) has too many recursions={count}");
+            }
+
+            System.Diagnostics.Trace.WriteLine(message);
+
+            count = Interlocked.Decrement(ref m_recursionCount);
+
+            //Intemporal.Experimental.Diagnostics.NativeMethods.NativeWin32.OutputDebugString($"TRACE: {nameof(TraceListenerToLogger)}.WriteLine(string?) with Instance {iHashCode} has {count} recursions");
+
+            if (count < 0)
+            {
+                //Intemporal.Experimental.Diagnostics.NativeMethods.NativeWin32.OutputDebugString($"TRACE: {nameof(TraceListenerToLogger)}.WriteLine(string?) with Instance {iHashCode} has {count} recursions");
+                throw new InvalidOperationException($"TRACE: {nameof(NativeWin32)}.OutputDebugString(string?) has too few recursions={count}");
+            }
+
+        }
+#endif
+
+    }
+
+    //namespace OutputDebugString
+    //{
+    //    class Program
+    //    {
+
+    //        static void Main(string[] args)
+    //        {
+    //            Console.WriteLine("Main - Enter - Console.WriteLine");
+    //            Debug.WriteLine("Main - Enter - Debug.WriteLine");
+    //            OutputDebugString("Main - Enter - OutputDebugString");
+    //            OutputDebugString("Main - Exit - OutputDebugString");
+    //            Debug.WriteLine("Main - Exit - Debug.WriteLine");
+    //            Console.WriteLine("Main - Exit - Console.WriteLine");
+    //        }
+    //    }
+    //}
+
+}
+#endif
 #endif

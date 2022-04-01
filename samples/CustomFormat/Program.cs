@@ -20,14 +20,14 @@ namespace CustomFormat
 
             try
             {
-                Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.TraceMethodEntry(false, $"App Launch at: {dtAppStart.ToUniversalTime()} UTC, equal to [0x{szTicks}] Ticks");
+                Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodEntry(false, $"App Launch at: {dtAppStart.ToUniversalTime()} UTC, equal to [0x{szTicks}] Ticks");
 
 //
 //C:\Tools\cmd>cd C:\Users\bjohnson\GitHub\owner\Intemporal\ExternalForks\Karambolo\samples\CustomFormat\bin\Debug\net6.0
 //C: \Users\bjohnson\GitHub\owner\Intemporal\ExternalForks\Karambolo\samples\CustomFormat\bin\Debug\net6.0 > xcopy / s / e / c / d.\logs\*.* ..\..\..\..\..\test - results\samples\CustomFormat\bin\Debug\net6.0\logs\
 
                 //
-                Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.WriteLine($"WARNING: No parameters were provided on command line, using static ones as default...");
+                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"WARNING: No parameters were provided on command line, using static ones as default...");
 
                 System.Console.WriteLine($"WARNING: No parameters were provided on command line, using static ones as default...");
 
@@ -150,7 +150,7 @@ namespace CustomFormat
                 //
                 // finished await of using service provider....
                 //
-                Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.WriteLine($"WARNING: Preparing to exit main thread/task");
+                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"WARNING: Preparing to exit main thread/task");
                 System.Console.WriteLine($"WARNING: Preparing to exit main thread/task");
 
                 //
@@ -158,30 +158,30 @@ namespace CustomFormat
                 //
                 if (fDelayBeforeExit)
                 {
-                    Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.WriteLine($"WARNING: Pausing for 5sec to ensure debugging is complete");
+                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"WARNING: Pausing for 5sec to ensure debugging is complete");
                     System.Console.WriteLine($"WARNING: Pausing for 5sec to ensure debugging is complete");
                     await Task.Delay(5000);
                 }
 
 
-                Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.WriteLine($"CRITICAL: Exiting main thread/task");
+                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"CRITICAL: Exiting main thread/task");
                 System.Console.WriteLine($"CRITICAL: Exiting main thread/task");
 
             }
             catch (System.Exception ex)
             {
-                Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.WriteLine($"ERROR: Application hit an unhandled exception");
-                Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.WriteLine($"EXCEPTION: {ex.Message}");
+                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"ERROR: Application hit an unhandled exception");
+                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"EXCEPTION: {ex.Message}");
                 if (null != ex.StackTrace)
                 {
-                    Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.WriteLine(ex.StackTrace.ToString());
+                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine(ex.StackTrace.ToString());
                 }
             }
             finally
             {
-                Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.ShowConfiguration(false, "Statistics at program exit");
+                Intemporal.Experimental.Diagnostics.Logging.Debugging.ShowConfiguration(false, "Statistics at program exit");
 
-                Intemporal.Experimental.Diagnostics.NativeMethods.Debugging.TraceMethodExit(false, $"App Exiting at: {dtAppStart.ToUniversalTime()} UTC, equal to [0x{szTicks}] Ticks");
+                Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, $"App Exiting at: {dtAppStart.ToUniversalTime()} UTC, equal to [0x{szTicks}] Ticks");
             }
         
         }  // async Task Main

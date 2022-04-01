@@ -30,6 +30,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Experimental\JsonExperiments\Intemporal.Experimental.Diagnostics.Logging\Intemporal.Experimental.Diagnostics.Logging.csproj" />
+    <ProjectReference Include="..\..\..\..\Experimental\JsonExperiments\Intemporal.Experimental.Server.Hosting.Logging\Intemporal.Experimental.Server.Hosting.Logging.csproj" />
     <ProjectReference Include="..\..\source\FileLogger\FileLogger.csproj" />
   </ItemGroup>
 

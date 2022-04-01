@@ -1,5 +1,6 @@
 ﻿#define IRL_INCLUDE_EXTENSIONS 
 #define IRL_SPRINT_3_OR_LATER
+#define IRL_SPRINT_4_OR_LATER
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -24,15 +25,22 @@ namespace Karambolo.Extensions.Logging.File
     {
         LogFileAccessMode? FileAccessMode { get; }
         Encoding FileEncoding { get; }
+
+#if IRL_INCLUDE_EXTENSIONS && IRL_SPRINT_4_OR_LATER
+        bool? UseUtcForLoggingTimestamps { get; }
+        
+        //bool? UseFirstCreationDate { get; }
+        
+        DateTime GetFileCreationDate();
+
+        long GetFileCreationTickCount();
+#endif
         string DateFormat { get; }
         string CounterFormat { get; }
         long? MaxFileSize { get; }
         IFileLogEntryTextBuilder TextBuilder { get; }
         bool? IncludeScopes { get; }
         int? MaxQueueSize { get; }
-#if IRL_INCLUDE_EXTENSIONS && IRL_SPRINT_4_OR_LATER
-        DateTime? BaseFileDate { get; }
-#endif
         LogFilePathPlaceholderResolver PathPlaceholderResolver { get; }
     }
 
@@ -40,10 +48,20 @@ namespace Karambolo.Extensions.Logging.File
     {
         string Path { get; }
 
-#if IRL_INCLUDE_EXTENSIONS && IRL_SPRINT_3_OR_LATER
-        bool? UseTickCount { get; }
-        long? TickCount { get; }
+#if IRL_INCLUDE_EXTENSIONS && (IRL_SPRINT_3_OR_LATER || IRL_SPRINT_4_OR_LATER)
+        // Common
         string? TickCountFormat { get; }
+
+        bool? UseTickCount { get; }
+#if IRL_SPRINT_4_OR_LATER
+        // Sprint 4
+        bool? UseFirstCreationDate { get; }
+#else
+        // Sprint 3
+        long? TickCount { get; }
+
+#endif
+        // Common
 #endif
         LogLevel GetMinLevel(string categoryName);
     }
@@ -67,6 +85,10 @@ namespace Karambolo.Extensions.Logging.File
             IncludeScopes = other.IncludeScopes;
             MaxQueueSize = other.MaxQueueSize;
             PathPlaceholderResolver = other.PathPlaceholderResolver;
+#if IRL_INCLUDE_EXTENSIONS && IRL_SPRINT_4_OR_LATER
+            UseUtcForLoggingTimestamps = other.UseUtcForLoggingTimestamps;
+            BaseCreationDate = other.BaseCreationDate;
+#endif
         }
 
         public LogFileAccessMode? FileAccessMode { get; set; }
@@ -81,6 +103,38 @@ namespace Karambolo.Extensions.Logging.File
 
         public string DateFormat { get; set; }
 
+#if IRL_INCLUDE_EXTENSIONS && IRL_SPRINT_4_OR_LATER
+
+        private DateTime BaseCreationDate { get; set; }
+
+        public bool? UseUtcForLoggingTimestamps { get; set; }
+
+
+        public DateTime GetFileCreationDate()
+        {
+            // Default is to use local time
+            bool fUseUtcDateTimeNow = this.UseUtcForLoggingTimestamps ?? false;
+
+            if (BaseCreationDate > DateTime.UtcNow)
+            {
+                BaseCreationDate = DateTime.UtcNow;
+            }
+
+            if (fUseUtcDateTimeNow)
+            {
+                return BaseCreationDate;
+            }
+            else
+            {
+                return BaseCreationDate.ToLocalTime();
+            }
+        }
+
+        public long GetFileCreationTickCount()
+        {
+            return GetFileCreationDate().Ticks;
+        }
+#endif
         public string CounterFormat { get; set; }
 
         public long? MaxFileSize { get; set; }
@@ -154,10 +208,20 @@ namespace Karambolo.Extensions.Logging.File
 
         public string Path { get; set; }
 
-#if IRL_INCLUDE_EXTENSIONS && IRL_SPRINT_3_OR_LATER
+#if IRL_INCLUDE_EXTENSIONS && (IRL_SPRINT_3_OR_LATER || IRL_SPRINT_4_OR_LATER)
+        //
+        // Yuck, this seems like I did it backwards... this should be on the base file ...
+        public string TickCountFormat { get; set; }
         public bool? UseTickCount { get; set; }
+
+#if IRL_SPRINT_4_OR_LATER
+        //
+        // Yuck, this seems like I did it backwards... this should be on the base file ...
+        public bool? UseFirstCreationDate { get; set; }
+
+#else
         public long? TickCount { get; set; }
-        public string TickCountFormat { get; set;  }
+#endif
 #endif
 
         public Dictionary<string, LogLevel> MinLevel { get; set; }
