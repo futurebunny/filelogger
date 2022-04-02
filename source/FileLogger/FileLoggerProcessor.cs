@@ -44,78 +44,106 @@ namespace Karambolo.Extensions.Logging.File
 
             public LogFileInfo(FileLoggerProcessor processor, ILogFileSettings fileSettings, IFileLoggerSettings settings)
             {
-#if IRL_INCLUDE_EXTENSIONS && (IRL_SPRINT_3_OR_LATER || IRL_SPRINT_4_OR_LATER)
-                DateTime dtCreateLogFile = DateTime.UtcNow.ToLocalTime();
-#if IRL_SPRINT_4_OR_LATER
-                dtCreateLogFile = processor.Context.FileLoggerContextCreated.ToLocalTime();
-
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {dtCreateLogFile.ToLocalTime().ToString("O")} equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}] Ticks");
-
-                LogFileCreationTimestamp = processor.Context.FileLoggerContextCreated.ToLocalTime();
-
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {LogFileCreationTimestamp.ToLocalTime().ToString("O")} equal to [0x{LogFileCreationTimestamp.Ticks.ToString("X8")}] Ticks");
-
-                DateTime firstCreationDate = fileSettings.GetFileCreationDate();
-
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {firstCreationDate.ToLocalTime().ToString("O")} equal to [0x{firstCreationDate.Ticks.ToString("X8")}] Ticks");
-
-#endif
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodEntry(false, $">> Start Creating Log File Info at: {dtCreateLogFile.ToLocalTime()}, equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}]");
-#endif
-
-                BasePath = settings.BasePath ?? string.Empty;
-                PathFormat = fileSettings.Path;
-                PathPlaceholderResolver = GetActualPathPlaceholderResolver(fileSettings.PathPlaceholderResolver ?? settings.PathPlaceholderResolver);
-                FileAppender = settings.FileAppender ?? processor._fallbackFileAppender.Value;
-                AccessMode = fileSettings.FileAccessMode ?? settings.FileAccessMode ?? LogFileAccessMode.Default;
-                Encoding = fileSettings.FileEncoding ?? settings.FileEncoding ?? Encoding.UTF8;
-                DateFormat = fileSettings.DateFormat ?? settings.DateFormat ?? "dt<date:yyyy>-<date:MM>-<date:dd>--<date:HH>-<date:mm>-<date:ss>";
-                CounterFormat = fileSettings.CounterFormat ?? settings.CounterFormat;
-                MaxSize = fileSettings.MaxFileSize ?? settings.MaxFileSize ?? 0;
+                bool fExceptionsHit = true;
+                try
+                {
 
 #if IRL_INCLUDE_EXTENSIONS && (IRL_SPRINT_3_OR_LATER || IRL_SPRINT_4_OR_LATER)
-                UseTickCount = fileSettings.UseTickCount ?? false;
-
-                TickCountFormat = fileSettings.TickCountFormat ?? "X8";
+                    DateTime dtCreateLogFile = DateTime.UtcNow.ToLocalTime();
+                    Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodEntry(false, $">> Start LogFileInfo.ctor() at: {dtCreateLogFile.ToLocalTime().ToString("O")}, equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}]");
 #if IRL_SPRINT_4_OR_LATER
-                //
-                // Now we should just use the LogFileCreationTimestamp.Ticks in the formatting code
-                //
-                TickCount = LogFileCreationTimestamp.Ticks;
+                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Updating dtCreateLogFile = processor.Context.FileLoggerContextCreated.ToLocalTime()");
+                    dtCreateLogFile = processor.Context.FileLoggerContextCreated.ToLocalTime();
 
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for TickCount was updated to {LogFileCreationTimestamp.ToLocalTime().ToString("O")} equal to [0x{LogFileCreationTimestamp.Ticks.ToString("X8")}] Ticks");
+                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {dtCreateLogFile.ToLocalTime().ToString("O")} equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}] Ticks");
 
-                long lTickCountCommon = fileSettings.GetFileCreationTickCount();
+                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Updating LogFileCreationTimestamp = processor.Context.FileLoggerContextCreated.ToLocalTime()");
+                    LogFileCreationTimestamp = processor.Context.FileLoggerContextCreated.ToLocalTime();
 
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for TickCount was updated to equal to [0x{lTickCountCommon.ToString("X8")}] Ticks");
+                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {LogFileCreationTimestamp.ToLocalTime().ToString("O")} equal to [0x{LogFileCreationTimestamp.Ticks.ToString("X8")}] Ticks");
+
+                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Updating DateTime firstCreationDate = fileSettings.GetFileCreationDate()");
+                    DateTime firstCreationDate = fileSettings.GetFileCreationDate();
+
+                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {firstCreationDate.ToLocalTime().ToString("O")} equal to [0x{firstCreationDate.Ticks.ToString("X8")}] Ticks");
+#endif
+#endif
+
+                    BasePath = settings.BasePath ?? string.Empty;
+                    PathFormat = fileSettings.Path;
+                    PathPlaceholderResolver = GetActualPathPlaceholderResolver(fileSettings.PathPlaceholderResolver ?? settings.PathPlaceholderResolver);
+                    FileAppender = settings.FileAppender ?? processor._fallbackFileAppender.Value;
+                    AccessMode = fileSettings.FileAccessMode ?? settings.FileAccessMode ?? LogFileAccessMode.Default;
+                    Encoding = fileSettings.FileEncoding ?? settings.FileEncoding ?? Encoding.UTF8;
+                    DateFormat = fileSettings.DateFormat ?? settings.DateFormat ?? "dt<date:yyyy>-<date:MM>-<date:dd>--<date:HH>-<date:mm>-<date:ss>--";
+                    CounterFormat = fileSettings.CounterFormat ?? settings.CounterFormat;
+                    MaxSize = fileSettings.MaxFileSize ?? settings.MaxFileSize ?? 0;
+
+#if IRL_INCLUDE_EXTENSIONS && (IRL_SPRINT_3_OR_LATER || IRL_SPRINT_4_OR_LATER)
+                    UseTickCount = fileSettings.UseTickCount ?? false;
+
+                    TickCountFormat = fileSettings.TickCountFormat ?? "X8";
+#if IRL_SPRINT_4_OR_LATER
+                    //
+                    // Now we should just use the LogFileCreationTimestamp.Ticks in the formatting code
+                    //
+                    TickCount = LogFileCreationTimestamp.Ticks;
+
+                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for TickCount was updated to {LogFileCreationTimestamp.ToLocalTime().ToString("O")} equal to [0x{LogFileCreationTimestamp.Ticks.ToString("X8")}] Ticks");
+
+                    long lTickCountCommon = fileSettings.GetFileCreationTickCount();
+
+                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for TickCount was updated to equal to [0x{lTickCountCommon.ToString("X8")}] Ticks");
 
 #else
                 TickCount = dtCreateLogFile.Ticks;
 #endif
 #endif
 
-                //
-                // This is async, so the actual file creation time will differ from the internal reference time
-                //
-                Queue = processor.CreateLogFileQueue(fileSettings, settings);
+                    //
+                    // This is async, so the actual file creation time will differ from the internal reference time
+                    //
+                    Queue = processor.CreateLogFileQueue(fileSettings, settings);
 
-                // important: closure must pick up the current token!
-                CancellationToken forcedCompleteToken = processor._forcedCompleteTokenSource.Token;
-                WriteFileTask = Task.Run(() => processor.WriteFileAsync(this, forcedCompleteToken));
+                    // important: closure must pick up the current token!
+                    CancellationToken forcedCompleteToken = processor._forcedCompleteTokenSource.Token;
+                    WriteFileTask = Task.Run(() => processor.WriteFileAsync(this, forcedCompleteToken));
 
-                static LogFilePathPlaceholderResolver GetActualPathPlaceholderResolver(LogFilePathPlaceholderResolver resolver) =>
-                    resolver == null ?
-                    s_defaultPathPlaceholderResolver :
-                    (placeholderName, inlineFormat, context) => resolver(placeholderName, inlineFormat, context) ?? s_defaultPathPlaceholderResolver(placeholderName, inlineFormat, context);
+                    static LogFilePathPlaceholderResolver GetActualPathPlaceholderResolver(LogFilePathPlaceholderResolver resolver) =>
+                        resolver == null ?
+                        s_defaultPathPlaceholderResolver :
+                        (placeholderName, inlineFormat, context) => resolver(placeholderName, inlineFormat, context) ?? s_defaultPathPlaceholderResolver(placeholderName, inlineFormat, context);
 
 
 #if IRL_INCLUDE_EXTENSIONS && (IRL_SPRINT_3_OR_LATER || IRL_SPRINT_4_OR_LATER)
+                    Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, $"<< Done LogFileInfo.ctor() at: {dtCreateLogFile.ToLocalTime().ToString("O")}, equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}]");
 #if IRL_SPRINT_4_OR_LATER
-                // Display both...
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, $"<< Done Creating Log File Info at: {LogFileCreationTimestamp.ToLocalTime()}, equal to [0x{LogFileCreationTimestamp.Ticks.ToString("X8")}]");
+                    // Display both...
+                    Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, $"<< Done LogFileInfo.ctor() at: {LogFileCreationTimestamp.ToLocalTime().ToString("O")}, equal to [0x{LogFileCreationTimestamp.Ticks.ToString("X8")}]");
 #endif
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, $"<< Done Creating Log File Info at: {dtCreateLogFile.ToLocalTime()}, equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}]");
 #endif
+
+
+                    fExceptionsHit = false;
+                }
+                catch (System.Exception ex)
+                {
+                    fExceptionsHit = true;
+
+                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"ERROR: Formatting request resulted in a normally unhandled exception");
+                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"EXCEPTION: {ex.Message}");
+                    if (null != ex.StackTrace)
+                    {
+                        Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine(ex.StackTrace.ToString());
+                    }
+                }
+                finally
+                {
+                    if (fExceptionsHit)
+                    {
+                        Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(fExceptionsHit, $"LogFilePathFormatContext.ctor() - unable to safely generate log file name");
+                    }
+                }
             }
 
             public string BasePath { get; }
@@ -196,16 +224,16 @@ namespace Karambolo.Extensions.Logging.File
                 {
 #if IRL_INCLUDE_EXTENSIONS
 #if IRL_SPRINT_4_OR_LATER
-                    DateTime dtCreateLogFile = logFile.LogFileCreationTimestamp; 
+                    DateTime dtCreateLogFile = logFile.LogFileCreationTimestamp.ToLocalTime(); 
 
                     //DateTime dtCreateLogFile = _logInitializedTimestamp;
                     //_logInitializedTimestamp = logFile.LogFileCreationTimestamp;
 
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {dtCreateLogFile.ToStringUtcInvariant()} equal to [0x{dtCreateLogFile.ToStringHexFullLength()}] Ticks");
-
-                    string szTicks = $"[0x{dtCreateLogFile.Ticks.ToString("X8")}]";
+                    string szTicks = $"{dtCreateLogFile.Ticks.ToString("X8")}";
                     string szTime = dtCreateLogFile.ToLocalTime().ToString("O");
                     Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodEntry(false, $"LogFilePathFormatContext.ctor() - Begin Creating Log File at: {szTime}, equal to [0x{szTicks}]");
+
+                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {dtCreateLogFile.ToStringUtcInvariant()} equal to [0x{dtCreateLogFile.ToStringHexFullLength()}] Ticks");
 #endif
 #endif
 
@@ -218,26 +246,28 @@ namespace Karambolo.Extensions.Logging.File
                     // Now already done above at function entrance
                     _logInitializedTimestamp = _logFile.LogFileCreationTimestamp;
 
-                    szTicks = $"[0x{_logInitializedTimestamp.Ticks.ToString("X8")}]";
+                    szTicks = $"{_logInitializedTimestamp.Ticks.ToString("X8")}";
                     szTime = _logInitializedTimestamp.ToLocalTime().ToString("O");
 
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for _logInitializedTimestamp was updated to {szTime} equal to [0x{szTicks}] Ticks");
+                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for _logInitializedTimestamp was initialized to {szTime} equal to [0x{szTicks}] Ticks");
+
+                    dtCreateLogFile = _logInitializedTimestamp.ToLocalTime();
 
                     Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {dtCreateLogFile.ToStringUtcInvariant()} equal to [0x{dtCreateLogFile.ToStringHexFullLength()}] Ticks");
 
                     //Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {dtCreateLogFile.ToLocalTime().ToString("O")} equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}] Ticks");
 
-                    //Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {dtCreateLogFile.ToLocalTime().ToString("o")} equal to [0x{dtCreateLogFile.Ticks.ToString("8X")}] Ticks");
+                    //Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {dtCreateLogFile.ToLocalTime().ToString("o")} equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}] Ticks");
 
                     
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, $"LogFilePathFormatContext.ctor() - Begin Creating Log File at: {_logInitializedTimestamp.ToLocalTime()} , equal to [0x{_logInitializedTimestamp.Ticks.ToString("8X")}]");
+                    Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, $"LogFilePathFormatContext.ctor() - Begin Creating Log File at: {_logInitializedTimestamp.ToLocalTime().ToString("O")} , equal to [0x{_logInitializedTimestamp.Ticks.ToString("X8")}]");
 
                     Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, $"LogFilePathFormatContext.ctor() - Begin Creating Log File at: {_logInitializedTimestamp.ToStringUtcInvariant()} , equal to [0x{_logInitializedTimestamp.ToStringHexFullLength()}]");
 
 #elif IRL_SPRINT_3_OR_LATER
 
                     _logInitializedTimestamp = _logFile.LogFileCreationTimestamp;
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, $"Begin Creating Log File at: {_logInitializedTimestamp.ToLocalTime()} , equal to [0x{_logInitializedTimestamp.Ticks.ToString("8X")}]");
+                    Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, $"Begin Creating Log File at: {_logInitializedTimestamp.ToLocalTime()} , equal to [0x{_logInitializedTimestamp.Ticks.ToString("X8")}]");
 #endif
 #endif
                     fExceptionsHit = false;
@@ -644,7 +674,7 @@ namespace Karambolo.Extensions.Logging.File
 #if DEBUG
             try
             {
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodEntry(false, null);
+                Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodEntry(false, "Creating Date Fragment");
 
                 string szFormat = inlineFormat ?? logFile.DateFormat;
 
@@ -693,7 +723,11 @@ namespace Karambolo.Extensions.Logging.File
             }
             finally
             {
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit((null != szValue), szValue ?? String.Empty);
+                if (null == szValue)
+                {
+                    szValue = String.Empty;
+                }
+                Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, $"Returning Date Fragment [{szValue}]");
             }
 #else
             //return  entry.Timestamp.ToLocalTime().ToString(inlineFormat ?? logFile.DateFormat, CultureInfo.InvariantCulture);
@@ -738,7 +772,11 @@ namespace Karambolo.Extensions.Logging.File
             }
             finally
             {
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit((null != szValue), szValue ?? String.Empty);
+                if (null == szValue)
+                {
+                    szValue = String.Empty;
+                }
+                Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, $"Returning Counter Fragment [{szValue}]");
             }
 #else
             //return  logFile.Counter.ToString(inlineFormat ?? logFile.CounterFormat, CultureInfo.InvariantCulture);
@@ -782,7 +820,11 @@ namespace Karambolo.Extensions.Logging.File
             }
             finally
             {
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit((null != szValue), szValue ?? String.Empty);
+                if (null == szValue)
+                {
+                    szValue = String.Empty;
+                }
+                Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, $"Returning TickCount Fragment [{szValue}]");
             }
 #else
             //return logFile.TickCount.ToString(inlineFormat ?? logFile.TickCountFormat, CultureInfo.InvariantCulture);
