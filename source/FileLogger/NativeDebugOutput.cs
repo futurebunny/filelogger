@@ -2,8 +2,8 @@
 #define USE_KARAMBOLO_NAMESPACE
 #if false || INCLUDE_FOR_CURRENT_PROJECT
 #if true || INCLUDE_LOW_LEVEL_DEBUG_TRACING
-#undef USE_INTEMPORAL_SYSTEM
-#define USE_INTEMPORAL_EXPERIMENTAL
+//#define USE_INTEMPORAL_SYSTEM
+//#define USE_INTEMPORAL_EXPERIMENTAL
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +20,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 #endif
 
+#if USE_KARAMBOLO_NAMESPACE
+namespace Karambolo.Extensions.Logging.File
+#else
 #if USE_INTEMPORAL_SYSTEM
 //namespace Intemporal.System.Diagnostix
 namespace Intemporal.Experimental.Diagnostics.Logging
@@ -29,6 +32,7 @@ namespace Intemporal.Experimental.Diagnostics.Logging
 namespace Intemporal.Experimental.Diagnostics.Logging
 #else
 namespace Intemporal.Experimental.Diagnostics
+#endif
 #endif
 #endif
 {
@@ -265,10 +269,10 @@ namespace Intemporal.Experimental.Diagnostics
             DateTime dtAppTimeStamp = DateTime.UtcNow;
 
 #if true || CAPTURE_CONTEXT_CREATION
-            Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodEntry(false, $">> Starting GetDebuggingConfiguration() at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
+            Debugging.TraceMethodEntry(false, $">> Starting GetDebuggingConfiguration() at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
 #endif
 
-            Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Querying Debugging Configuration at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
+            Debugging.WriteLine($"DEBUG: Querying Debugging Configuration at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
 
             //
             // NOTE: This is not truly thread safe, but acts like a psuedo singleton... 
@@ -280,7 +284,7 @@ namespace Intemporal.Experimental.Diagnostics
             debuggingConfiguration.dtAppTimeStamp = dtAppTimeStamp;
 
 #if true || CAPTURE_CONTEXT_CREATION
-            Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, $"<< Finishing GetDebuggingConfiguration()  at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
+            Debugging.TraceMethodExit(false, $"<< Finishing GetDebuggingConfiguration()  at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
 #endif
             return debuggingConfiguration;
         }
@@ -293,10 +297,10 @@ namespace Intemporal.Experimental.Diagnostics
             DateTime dtAppTimeStamp = DateTime.UtcNow;
 
 #if true || CAPTURE_CONTEXT_CREATION
-            Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodEntry(false, $">> Starting GetDebuggingContext() at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
+            Debugging.TraceMethodEntry(false, $">> Starting GetDebuggingContext() at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
 #endif
 
-            Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Querying for Existing Debugging Context at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
+            Debugging.WriteLine($"DEBUG: Querying for Existing Debugging Context at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
 
             //
             // NOTE: This is not truly thread safe, but acts like a psuedo singleton... 
@@ -313,7 +317,7 @@ namespace Intemporal.Experimental.Diagnostics
                 //
                 // we need to generate all the following
                 //
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Initializing Debugging Context at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
+                Debugging.WriteLine($"DEBUG: Initializing Debugging Context at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
 
                 //
                 // Get name of running application or hosted assembly to use when creating log files...
@@ -325,7 +329,7 @@ namespace Intemporal.Experimental.Diagnostics
                 {
                     debuggingContext.ChildItemType = _childItemType;
                     owningAssembly = _childItemType.Assembly;
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"INFORMATION: Type [{_childItemType.ToString()}] is owned/contained in assembly [{owningAssembly.FullName}] at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
+                    Debugging.WriteLine($"INFORMATION: Type [{_childItemType.ToString()}] is owned/contained in assembly [{owningAssembly.FullName}] at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
 
                     //
                     // Save this or null out
@@ -375,7 +379,7 @@ namespace Intemporal.Experimental.Diagnostics
                     {
                         debuggingContext.ExecutingAssemblyVersion = null;
                     }
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"INFORMATION: Currently Executing Assembly is [{executingAssembly.FullName}] at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
+                    Debugging.WriteLine($"INFORMATION: Currently Executing Assembly is [{executingAssembly.FullName}] at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
                     debuggingContext.IsExecutingAssemblyValid = true;
                 }
                 else
@@ -389,20 +393,20 @@ namespace Intemporal.Experimental.Diagnostics
 
                 if (null == Debugging.CurrentContext)
                 {
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Saving Debugging Context at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
+                    Debugging.WriteLine($"DEBUG: Saving Debugging Context at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
                     Debugging.CurrentContext = debuggingContext;
                 }
             }
             else
             {
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Returning Previously Initialized Debugging Context at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
+                Debugging.WriteLine($"DEBUG: Returning Previously Initialized Debugging Context at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
             }
 
 
 #if true || CAPTURE_CONTEXT_CREATION
             dtAppTimeStamp = DateTime.UtcNow;
 
-            Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, $"<< Finishing GetDebuggingContext()  at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
+            Debugging.TraceMethodExit(false, $"<< Finishing GetDebuggingContext()  at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
 #endif
 
             return debuggingContext;
@@ -416,7 +420,7 @@ namespace Intemporal.Experimental.Diagnostics
             DateTime dtAppTimeStamp = DateTime.UtcNow;
 
 #if true || CAPTURE_WORKER_CREATION
-            Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodEntry(false, $">> Starting TraceCreateLogFileWriter()  at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
+            Debugging.TraceMethodEntry(false, $">> Starting TraceCreateLogFileWriter()  at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
 #endif
 
             bool fLogFileNameCreated = false;
@@ -436,16 +440,16 @@ namespace Intemporal.Experimental.Diagnostics
             string szTraceFileName = String.Empty;
             string szTraceFileFullPath = $".\\Logs\\{szTraceFileName}";
 
-            Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"INFORMATION: Example => TraceWriter target filename would be [{szTraceFileCustomAppName}] at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
-            Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"INFORMATION: Example => TraceWriter target filename would be [{szTraceFileOwningAppName}] at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
-            Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"INFORMATION: Example => TraceWriter target filename would be [{szTraceFileExecutingAppName}] at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
+            Debugging.WriteLine($"INFORMATION: Example => TraceWriter target filename would be [{szTraceFileCustomAppName}] at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
+            Debugging.WriteLine($"INFORMATION: Example => TraceWriter target filename would be [{szTraceFileOwningAppName}] at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
+            Debugging.WriteLine($"INFORMATION: Example => TraceWriter target filename would be [{szTraceFileExecutingAppName}] at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
 #endif
 
 #if true || QUERY_CONFIGURATION_FOR_LOG_FILE_NAME
             //
             // Note, this should return a new or existing configuration object...
             //
-            Intemporal.Experimental.Diagnostics.Logging.Debugging.DebuggingConfiguration _DBGConfig = Intemporal.Experimental.Diagnostics.Logging.Debugging.GetDebuggingConfiguration();
+            Debugging.DebuggingConfiguration _DBGConfig = Debugging.GetDebuggingConfiguration();
 
             bool fUseCustomName = _DBGConfig.UseCustomApplicationName ?? false;
 
@@ -467,7 +471,7 @@ namespace Intemporal.Experimental.Diagnostics
 
                     szTraceFileCustomAppName = $"{szAppName}--dt{szLogFileDate}--{szLogFileTime}--TickCount[{szTickCount}]--TraceListener.log.txt";
                     
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"INFORMATION: Example => TraceWriter target filename would be [{szTraceFileCustomAppName}] at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
+                    Debugging.WriteLine($"INFORMATION: Example => TraceWriter target filename would be [{szTraceFileCustomAppName}] at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
 
                     szTraceFileName = szTraceFileCustomAppName;
 
@@ -489,7 +493,7 @@ namespace Intemporal.Experimental.Diagnostics
                 //
                 // Note, this is fucking this up, don't re run this code if we already have a context object...
                 //
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.DebuggingContext _DC = Intemporal.Experimental.Diagnostics.Logging.Debugging.GetDebuggingContext(null);
+                Debugging.DebuggingContext _DC = Debugging.GetDebuggingContext(null);
 
                 //("yyyy-MM-dd--HH:mm:ss.fffffffZzzz");
                 //"DateFormat": "yyyy-MM-dd",
@@ -536,7 +540,7 @@ namespace Intemporal.Experimental.Diagnostics
             {
                 szTraceFileFullPath = $".\\Logs\\{szTraceFileName}";
 
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"INFORMATION: Dynamic TraceWriter target filename would be [{szTraceFileFullPath}] at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
+                Debugging.WriteLine($"INFORMATION: Dynamic TraceWriter target filename would be [{szTraceFileFullPath}] at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
 
                 //
                 // Create Legacy Trace Listener and Consider holding on to this internally...and also returning it... will explain later...
@@ -544,16 +548,16 @@ namespace Intemporal.Experimental.Diagnostics
                 //System.Diagnostics.Trace.Listeners.Add(new TextWriterTraceListener("TextWriterOutput.log", "myListener"));
                 System.Diagnostics.TextWriterTraceListener twTraceListener = new TextWriterTraceListener(szTraceFileFullPath, "legacyAppListener");
 
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.LegacyTraceListener = twTraceListener;
+                Debugging.LegacyTraceListener = twTraceListener;
 
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"INFORMATION: Created Legacy TraceWriter target filename would be [{szTraceFileFullPath}] at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
+                Debugging.WriteLine($"INFORMATION: Created Legacy TraceWriter target filename would be [{szTraceFileFullPath}] at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
             }
 
 
             dtAppTimeStamp = DateTime.UtcNow;
 
 #if true || CAPTURE_CONTEXT_CREATION
-            Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, $"<< Finishing TraceCreateLogFileWriter()  at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
+            Debugging.TraceMethodExit(false, $"<< Finishing TraceCreateLogFileWriter()  at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
 #endif
 
             return;
@@ -564,7 +568,7 @@ namespace Intemporal.Experimental.Diagnostics
             DateTime dtAppTimeStamp = DateTime.UtcNow;
 
 #if true || CAPTURE_WORKER_CREATION
-            Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodEntry(false, $">> Starting SaveTraceToLogFile() at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
+            Debugging.TraceMethodEntry(false, $">> Starting SaveTraceToLogFile() at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
 #endif
 
             if (!String.IsNullOrEmpty(message))
@@ -585,23 +589,23 @@ namespace Intemporal.Experimental.Diagnostics
             //
             // This last step actually clears the existing trace listeners and just adds the file writer version... lol, i think it would have been easier to use this all along
             //
-            bool s_fAddTraceListerToLogger = (Intemporal.Experimental.Diagnostics.Logging.Debugging.LegacyTraceListener != null);
+            bool s_fAddTraceListerToLogger = (Debugging.LegacyTraceListener != null);
             System.Diagnostics.TextWriterTraceListener twTraceListener;
 
 #if true || SAVE_LEGACY_TRACE_OUTPUT_TO_FILE
 
-            if (Intemporal.Experimental.Diagnostics.Logging.Debugging.LegacyTraceListener != null)
+            if (Debugging.LegacyTraceListener != null)
             {
                 //
                 // Get a reference to the global legacy listener...
                 //
 
-                twTraceListener = Intemporal.Experimental.Diagnostics.Logging.Debugging.LegacyTraceListener;
+                twTraceListener = Debugging.LegacyTraceListener;
                 Debugging.WriteLine($"CRITICAL: Successfully created legacy TraceListener to capture legacy output to a file...");
 
                 if (s_fAddTraceListerToLogger)
                 {
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"IMPORTANT: Preparing to clear and add new file writer trace listener to the empty collection at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
+                    Debugging.WriteLine($"IMPORTANT: Preparing to clear and add new file writer trace listener to the empty collection at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
 
                     int iActiveListeners = System.Diagnostics.Trace.Listeners.Count;
 
@@ -620,12 +624,12 @@ namespace Intemporal.Experimental.Diagnostics
                     if (iNewActiveListeners > iActiveListeners)
                     {
                         Debugging.WriteLine($"IMPORTANT: Successfully added new trace listener to the current collection");
-                        Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"IMPORTANT: Successfully added new trace listener to the current collection at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
+                        Debugging.WriteLine($"IMPORTANT: Successfully added new trace listener to the current collection at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
                     }
                     else
                     {
                         Debugging.WriteLine($"ERROR: Failed to add new trace listener to the current collection");
-                        Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"CRITICAL: Failed to add new trace listener to the current collection at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
+                        Debugging.WriteLine($"CRITICAL: Failed to add new trace listener to the current collection at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
                     }
                 }
             }
@@ -636,7 +640,7 @@ namespace Intemporal.Experimental.Diagnostics
             dtAppTimeStamp = DateTime.UtcNow;
 
 #if true || CAPTURE_CONTEXT_CREATION
-            Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, $"<< Finishing SaveTraceToLogFile() at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
+            Debugging.TraceMethodExit(false, $"<< Finishing SaveTraceToLogFile() at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
 #endif
 
         }
