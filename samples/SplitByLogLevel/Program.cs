@@ -12,9 +12,16 @@ namespace SplitByLogLevel
     {
         private static async Task Main(string[] args)
         {
+
+#if DEBUG
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.Development.json")
+                .Build();
+#else
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .Build();
+#endif
 
             var services = new ServiceCollection();
 

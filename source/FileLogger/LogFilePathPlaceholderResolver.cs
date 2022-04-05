@@ -18,6 +18,5 @@ namespace Karambolo.Extensions.Logging.File
 #endif
     }
 
-
     public delegate string LogFilePathPlaceholderResolver(string placeholderName, string inlineFormat, ILogFilePathFormatContext context);
 }

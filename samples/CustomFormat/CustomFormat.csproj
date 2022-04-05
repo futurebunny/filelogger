@@ -7,15 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="appsettings.Development.Timestamped.json" />
     <None Remove="appsettings.json" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="appsettings.Development.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="appsettings.Development.Timestamped.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="appsettings.json">
@@ -30,8 +26,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Experimental\JsonExperiments\Intemporal.Experimental.Diagnostics.Logging\Intemporal.Experimental.Diagnostics.Logging.csproj" />
-    <ProjectReference Include="..\..\..\..\Experimental\JsonExperiments\Intemporal.Experimental.Server.Hosting.Logging\Intemporal.Experimental.Server.Hosting.Logging.csproj" />
     <ProjectReference Include="..\..\source\FileLogger\FileLogger.csproj" />
   </ItemGroup>
 

@@ -13,83 +13,19 @@ namespace CustomFormat
     {
         private static async Task Main(string[] args)
         {
-            bool fDelayBeforeExit = true;
-
-            DateTime dtAppStart = DateTime.Now;
-            String szTicks = dtAppStart.Ticks.ToString("X8");
-
             try
             {
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodEntry(false, $"App Launch at: {dtAppStart.ToUniversalTime()} UTC, equal to [0x{szTicks}] Ticks");
-
-//
-//C:\Tools\cmd>cd C:\Users\bjohnson\GitHub\owner\Intemporal\ExternalForks\Karambolo\samples\CustomFormat\bin\Debug\net6.0
-//C: \Users\bjohnson\GitHub\owner\Intemporal\ExternalForks\Karambolo\samples\CustomFormat\bin\Debug\net6.0 > xcopy / s / e / c / d.\logs\*.* ..\..\..\..\..\test - results\samples\CustomFormat\bin\Debug\net6.0\logs\
-
-                //
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"WARNING: No parameters were provided on command line, using static ones as default...");
-
-                System.Console.WriteLine($"WARNING: No parameters were provided on command line, using static ones as default...");
-
-
 
 #if DEBUG
-#if DEBUG_INC_TIMESTAMPED_LOGS
-                var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.Development.Timestamped.json")
-                .Build();
-#else
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.Development.json")
                 .Build();
-#endif
 #else
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .Build();
 #endif
 
-#if SPRINT_4
-            string? szLogFileName = null;
-
-            if (null != configuration)
-            {
-                IConfigurationSection iLoggingConfiguration = null;
-                IConfigurationSection iFileLoggerConfiguration = null;
-
-                //IConfigurationSection iFileLoggerConfiguration = configuration.GetRequiredSection("File");
-
-                //Key "Logging:File:Files:0:Path" string
-
-                iLoggingConfiguration = configuration.GetSection("Logging");
-
-                iFileLoggerConfiguration = iLoggingConfiguration.GetSection("File");
-
-                //Key "Logging:File:Files:1:Path" string
-                //iFileLoggerConfiguration.GetSection("Files");
-
-                if (iFileLoggerConfiguration != null)
-                {
-                    object oPath = iFileLoggerConfiguration.GetValue(szLogFileName.GetType(), "Path");
-
-                    object oLogFileName = iFileLoggerConfiguration.GetValue(typeof(string), "Path");
-
-                    if ((oPath != null) && (oPath.GetType() == typeof(string)))
-                    {
-                        szLogFileName = oPath.ToString();
-                    } 
-                    else if ((oLogFileName != null) && (oLogFileName.GetType() == typeof(string)))
-                    {
-                        szLogFileName = oLogFileName.ToString();
-                    }
-                }
-            }
-            if (String.IsNullOrEmpty(szLogFileName))
-            {
-                System.Diagnostics.Debug.WriteLine($"DEBUG: PathNameParameter is: {szLogFileName}");
-                System.Console.WriteLine($"DEBUG: PathNameParameter is: {szLogFileName}");
-            }
-#endif
                 var services = new ServiceCollection();
 
                 services.AddLogging(builder =>
@@ -141,47 +77,16 @@ namespace CustomFormat
 
                     }
                 }
-
-                //
-                // This is a questionable or buggy example, we should be closing everything down here...
-                //
-
-
-                //
-                // finished await of using service provider....
-                //
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"WARNING: Preparing to exit main thread/task");
-                System.Console.WriteLine($"WARNING: Preparing to exit main thread/task");
-
-                //
-                //
-                //
-                if (fDelayBeforeExit)
-                {
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"WARNING: Pausing for 5sec to ensure debugging is complete");
-                    System.Console.WriteLine($"WARNING: Pausing for 5sec to ensure debugging is complete");
-                    await Task.Delay(5000);
-                }
-
-
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"CRITICAL: Exiting main thread/task");
-                System.Console.WriteLine($"CRITICAL: Exiting main thread/task");
-
+   
             }
             catch (System.Exception ex)
             {
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"ERROR: Application hit an unhandled exception");
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"EXCEPTION: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"ERROR: Application hit an unhandled exception");
+                System.Diagnostics.Debug.WriteLine($"EXCEPTION: {ex.Message}");
                 if (null != ex.StackTrace)
                 {
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine(ex.StackTrace.ToString());
+                    System.Diagnostics.Debug.WriteLine(ex.StackTrace.ToString());
                 }
-            }
-            finally
-            {
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.ShowConfiguration(false, "Statistics at program exit");
-
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, $"App Exiting at: {dtAppStart.ToUniversalTime()} UTC, equal to [0x{szTicks}] Ticks");
             }
         
         }  // async Task Main
