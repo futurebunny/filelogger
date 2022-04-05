@@ -1,4 +1,5 @@
 ﻿#define INCLUDE_ILOGGER_EXTENSION_FEATURES
+#define USE_KARAMBOLO_NAMESPACE
 #if false || INCLUDE_FOR_CURRENT_PROJECT
 #if true || INCLUDE_LOW_LEVEL_DEBUG_TRACING
 #undef USE_INTEMPORAL_SYSTEM
@@ -208,7 +209,7 @@ namespace Intemporal.Experimental.Diagnostics
                 }
                 catch (Exception ex)
                 {
-                    //Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"EXCEPTION: Attempting to check for active legacy Trace Listeners.");
+                    //Debugging.WriteLine($"EXCEPTION: Attempting to check for active legacy Trace Listeners.");
                     fManagedListenersAvailable = false;
                 }
 #endif
@@ -805,9 +806,17 @@ namespace Intemporal.Experimental.Diagnostics.NativeMethods
 }
 #endif
 #else
+#if USE_KARAMBOLO_NAMESPACE
+namespace Karambolo.Extensions.Logging.File
+#else
 namespace Intemporal.Experimental.Diagnostics.Logging
+#endif
 {
+#if USE_KARAMBOLO_NAMESPACE
+    internal static class Debugging
+#else
     public static class Debugging
+#endif
     {
         public static void WriteLine(string? message)
         {

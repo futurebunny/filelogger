@@ -22,14 +22,14 @@ namespace Karambolo.Extensions.Logging.File
 #if IRL_INCLUDE_EXTENSIONS && IRL_SPRINT_4_OR_LATER
             FileLoggerContextCreated = DateTime.UtcNow;
 
-            Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodEntry(false, $">> Begin Creating FileLoggerContext() at: {FileLoggerContextCreated.ToLocalTime()}, equal to [0x{FileLoggerContextCreated.Ticks.ToString("X8")}]");
+            Debugging.TraceMethodEntry(false, $">> Begin Creating FileLoggerContext() at: {FileLoggerContextCreated.ToLocalTime()}, equal to [0x{FileLoggerContextCreated.Ticks.ToString("X8")}]");
 #endif
             CompleteToken = completeToken;
             CompletionTimeout = completionTimeout ?? TimeSpan.FromMilliseconds(1500);
             WriteRetryDelay = writeRetryDelay ?? TimeSpan.FromMilliseconds(500);
 
 #if IRL_INCLUDE_EXTENSIONS && IRL_SPRINT_4_OR_LATER
-            Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, $"<< Done Creating FileLoggerContext() at: {FileLoggerContextCreated.ToLocalTime()}, equal to [0x{FileLoggerContextCreated.Ticks.ToString("X8")}]");
+            Debugging.TraceMethodExit(false, $"<< Done Creating FileLoggerContext() at: {FileLoggerContextCreated.ToLocalTime()}, equal to [0x{FileLoggerContextCreated.Ticks.ToString("X8")}]");
 #endif
         }
 

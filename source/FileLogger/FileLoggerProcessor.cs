@@ -1,6 +1,7 @@
 ﻿#define IRL_INCLUDE_EXTENSIONS 
 #define IRL_SPRINT_3_OR_LATER
 #define IRL_SPRINT_4_OR_LATER
+#define USE_KARAMBOLO_NAMESPACE
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -14,7 +15,11 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.FileProviders;
 
 #if IRL_INCLUDE_EXTENSIONS
+#if USE_KARAMBOLO_NAMESPACE
+using Karambolo.Extensions.Logging.File;
+#else
 using Intemporal.Experimental.Diagnostics.Logging;
+#endif
 #endif
 
 namespace Karambolo.Extensions.Logging.File
@@ -50,22 +55,22 @@ namespace Karambolo.Extensions.Logging.File
 
 #if IRL_INCLUDE_EXTENSIONS && (IRL_SPRINT_3_OR_LATER || IRL_SPRINT_4_OR_LATER)
                     DateTime dtCreateLogFile = DateTime.UtcNow.ToLocalTime();
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodEntry(false, $">> Start LogFileInfo.ctor() at: {dtCreateLogFile.ToLocalTime().ToString("O")}, equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}]");
+                    Debugging.TraceMethodEntry(false, $">> Start LogFileInfo.ctor() at: {dtCreateLogFile.ToLocalTime().ToString("O")}, equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}]");
 #if IRL_SPRINT_4_OR_LATER
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Updating dtCreateLogFile = processor.Context.FileLoggerContextCreated.ToLocalTime()");
+                    Debugging.WriteLine($"DEBUG: Updating dtCreateLogFile = processor.Context.FileLoggerContextCreated.ToLocalTime()");
                     dtCreateLogFile = processor.Context.FileLoggerContextCreated.ToLocalTime();
 
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {dtCreateLogFile.ToLocalTime().ToString("O")} equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}] Ticks");
+                    Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {dtCreateLogFile.ToLocalTime().ToString("O")} equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}] Ticks");
 
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Updating LogFileCreationTimestamp = processor.Context.FileLoggerContextCreated.ToLocalTime()");
+                    Debugging.WriteLine($"DEBUG: Updating LogFileCreationTimestamp = processor.Context.FileLoggerContextCreated.ToLocalTime()");
                     LogFileCreationTimestamp = processor.Context.FileLoggerContextCreated.ToLocalTime();
 
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {LogFileCreationTimestamp.ToLocalTime().ToString("O")} equal to [0x{LogFileCreationTimestamp.Ticks.ToString("X8")}] Ticks");
+                    Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {LogFileCreationTimestamp.ToLocalTime().ToString("O")} equal to [0x{LogFileCreationTimestamp.Ticks.ToString("X8")}] Ticks");
 
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Updating DateTime firstCreationDate = fileSettings.GetFileCreationDate()");
+                    Debugging.WriteLine($"DEBUG: Updating DateTime firstCreationDate = fileSettings.GetFileCreationDate()");
                     DateTime firstCreationDate = fileSettings.GetFileCreationDate();
 
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {firstCreationDate.ToLocalTime().ToString("O")} equal to [0x{firstCreationDate.Ticks.ToString("X8")}] Ticks");
+                    Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {firstCreationDate.ToLocalTime().ToString("O")} equal to [0x{firstCreationDate.Ticks.ToString("X8")}] Ticks");
 #endif
 #endif
 
@@ -89,11 +94,11 @@ namespace Karambolo.Extensions.Logging.File
                     //
                     TickCount = LogFileCreationTimestamp.Ticks;
 
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for TickCount was updated to {LogFileCreationTimestamp.ToLocalTime().ToString("O")} equal to [0x{LogFileCreationTimestamp.Ticks.ToString("X8")}] Ticks");
+                    Debugging.WriteLine($"DEBUG: Value for TickCount was updated to {LogFileCreationTimestamp.ToLocalTime().ToString("O")} equal to [0x{LogFileCreationTimestamp.Ticks.ToString("X8")}] Ticks");
 
                     long lTickCountCommon = fileSettings.GetFileCreationTickCount();
 
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for TickCount was updated to equal to [0x{lTickCountCommon.ToString("X8")}] Ticks");
+                    Debugging.WriteLine($"DEBUG: Value for TickCount was updated to equal to [0x{lTickCountCommon.ToString("X8")}] Ticks");
 
 #else
                 TickCount = dtCreateLogFile.Ticks;
@@ -116,10 +121,10 @@ namespace Karambolo.Extensions.Logging.File
 
 
 #if IRL_INCLUDE_EXTENSIONS && (IRL_SPRINT_3_OR_LATER || IRL_SPRINT_4_OR_LATER)
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, $"<< Done LogFileInfo.ctor() at: {dtCreateLogFile.ToLocalTime().ToString("O")}, equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}]");
+                    Debugging.TraceMethodExit(false, $"<< Done LogFileInfo.ctor() at: {dtCreateLogFile.ToLocalTime().ToString("O")}, equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}]");
 #if IRL_SPRINT_4_OR_LATER
                     // Display both...
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, $"<< Done LogFileInfo.ctor() at: {LogFileCreationTimestamp.ToLocalTime().ToString("O")}, equal to [0x{LogFileCreationTimestamp.Ticks.ToString("X8")}]");
+                    Debugging.TraceMethodExit(false, $"<< Done LogFileInfo.ctor() at: {LogFileCreationTimestamp.ToLocalTime().ToString("O")}, equal to [0x{LogFileCreationTimestamp.Ticks.ToString("X8")}]");
 #endif
 #endif
 
@@ -130,18 +135,18 @@ namespace Karambolo.Extensions.Logging.File
                 {
                     fExceptionsHit = true;
 
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"ERROR: Formatting request resulted in a normally unhandled exception");
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"EXCEPTION: {ex.Message}");
+                    Debugging.WriteLine($"ERROR: Formatting request resulted in a normally unhandled exception");
+                    Debugging.WriteLine($"EXCEPTION: {ex.Message}");
                     if (null != ex.StackTrace)
                     {
-                        Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine(ex.StackTrace.ToString());
+                        Debugging.WriteLine(ex.StackTrace.ToString());
                     }
                 }
                 finally
                 {
                     if (fExceptionsHit)
                     {
-                        Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(fExceptionsHit, $"LogFilePathFormatContext.ctor() - unable to safely generate log file name");
+                        Debugging.TraceMethodExit(fExceptionsHit, $"LogFilePathFormatContext.ctor() - unable to safely generate log file name");
                     }
                 }
             }
@@ -231,9 +236,9 @@ namespace Karambolo.Extensions.Logging.File
 
                     string szTicks = $"{dtCreateLogFile.Ticks.ToString("X8")}";
                     string szTime = dtCreateLogFile.ToLocalTime().ToString("O");
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodEntry(false, $"LogFilePathFormatContext.ctor() - Begin Creating Log File at: {szTime}, equal to [0x{szTicks}]");
+                    Debugging.TraceMethodEntry(false, $"LogFilePathFormatContext.ctor() - Begin Creating Log File at: {szTime}, equal to [0x{szTicks}]");
 
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {dtCreateLogFile.ToStringUtcInvariant()} equal to [0x{dtCreateLogFile.ToStringHexFullLength()}] Ticks");
+                    Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {dtCreateLogFile.ToStringUtcInvariant()} equal to [0x{dtCreateLogFile.ToStringHexFullLength()}] Ticks");
 #endif
 #endif
 
@@ -249,25 +254,25 @@ namespace Karambolo.Extensions.Logging.File
                     szTicks = $"{_logInitializedTimestamp.Ticks.ToString("X8")}";
                     szTime = _logInitializedTimestamp.ToLocalTime().ToString("O");
 
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for _logInitializedTimestamp was initialized to {szTime} equal to [0x{szTicks}] Ticks");
+                    Debugging.WriteLine($"DEBUG: Value for _logInitializedTimestamp was initialized to {szTime} equal to [0x{szTicks}] Ticks");
 
                     dtCreateLogFile = _logInitializedTimestamp.ToLocalTime();
 
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {dtCreateLogFile.ToStringUtcInvariant()} equal to [0x{dtCreateLogFile.ToStringHexFullLength()}] Ticks");
+                    Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {dtCreateLogFile.ToStringUtcInvariant()} equal to [0x{dtCreateLogFile.ToStringHexFullLength()}] Ticks");
 
-                    //Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {dtCreateLogFile.ToLocalTime().ToString("O")} equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}] Ticks");
+                    //Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {dtCreateLogFile.ToLocalTime().ToString("O")} equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}] Ticks");
 
-                    //Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {dtCreateLogFile.ToLocalTime().ToString("o")} equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}] Ticks");
+                    //Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {dtCreateLogFile.ToLocalTime().ToString("o")} equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}] Ticks");
 
                     
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, $"LogFilePathFormatContext.ctor() - Begin Creating Log File at: {_logInitializedTimestamp.ToLocalTime().ToString("O")} , equal to [0x{_logInitializedTimestamp.Ticks.ToString("X8")}]");
+                    Debugging.TraceMethodExit(false, $"LogFilePathFormatContext.ctor() - Begin Creating Log File at: {_logInitializedTimestamp.ToLocalTime().ToString("O")} , equal to [0x{_logInitializedTimestamp.Ticks.ToString("X8")}]");
 
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, $"LogFilePathFormatContext.ctor() - Begin Creating Log File at: {_logInitializedTimestamp.ToStringUtcInvariant()} , equal to [0x{_logInitializedTimestamp.ToStringHexFullLength()}]");
+                    Debugging.TraceMethodExit(false, $"LogFilePathFormatContext.ctor() - Begin Creating Log File at: {_logInitializedTimestamp.ToStringUtcInvariant()} , equal to [0x{_logInitializedTimestamp.ToStringHexFullLength()}]");
 
 #elif IRL_SPRINT_3_OR_LATER
 
                     _logInitializedTimestamp = _logFile.LogFileCreationTimestamp;
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, $"Begin Creating Log File at: {_logInitializedTimestamp.ToLocalTime()} , equal to [0x{_logInitializedTimestamp.Ticks.ToString("X8")}]");
+                    Debugging.TraceMethodExit(false, $"Begin Creating Log File at: {_logInitializedTimestamp.ToLocalTime()} , equal to [0x{_logInitializedTimestamp.Ticks.ToString("X8")}]");
 #endif
 #endif
                     fExceptionsHit = false;
@@ -276,18 +281,18 @@ namespace Karambolo.Extensions.Logging.File
                 {
                     fExceptionsHit = true;
 
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"ERROR: Formatting request resulted in a normally unhandled exception");
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"EXCEPTION: {ex.Message}");
+                    Debugging.WriteLine($"ERROR: Formatting request resulted in a normally unhandled exception");
+                    Debugging.WriteLine($"EXCEPTION: {ex.Message}");
                     if (null != ex.StackTrace)
                     {
-                        Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine(ex.StackTrace.ToString());
+                        Debugging.WriteLine(ex.StackTrace.ToString());
                     }
                 }
                 finally
                 {
                     if (fExceptionsHit)
                     {
-                        Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(fExceptionsHit, $"LogFilePathFormatContext.ctor() - unable to safely generate log file name");
+                        Debugging.TraceMethodExit(fExceptionsHit, $"LogFilePathFormatContext.ctor() - unable to safely generate log file name");
                     }
                 }
 
@@ -325,50 +330,50 @@ namespace Karambolo.Extensions.Logging.File
 #if DEBUG
             try
             {
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodEntry(false, placeholderName);
+                Debugging.TraceMethodEntry(false, placeholderName);
 
                 switch (placeholderName)
                 {
                     case "date":
                         {
-                            Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, "date");
+                            Debugging.TraceMethodExit(false, "date");
                             return context.FormatDate(inlineFormat);
                         }
 #if IRL_INCLUDE_EXTENSIONS && IRL_SPRINT_4_OR_LATER
                     case "time":
                         {
-                            Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, "time");
+                            Debugging.TraceMethodExit(false, "time");
                             return context.FormatDate(inlineFormat);
                         }
 #endif
                     case "counter":
                         {
-                            Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, "counter");
+                            Debugging.TraceMethodExit(false, "counter");
                             return context.FormatCounter(inlineFormat);
                         }
 #if IRL_INCLUDE_EXTENSIONS && IRL_SPRINT_3_OR_LATER
                     case "ticks":
                         {
-                            Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, "ticks");
+                            Debugging.TraceMethodExit(false, "ticks");
                             return context.FormatTickCount(inlineFormat);
                         }
 #endif
                     default:
                         {
-                            Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(true, "default");
+                            Debugging.TraceMethodExit(true, "default");
                             return null;
                         }
                 }
             }
             catch (System.Exception ex)
             {
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"ERROR: Formatting log file path placeholder resulted in an unhandled exception");
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"EXCEPTION: {ex.Message}");
+                Debugging.WriteLine($"ERROR: Formatting log file path placeholder resulted in an unhandled exception");
+                Debugging.WriteLine($"EXCEPTION: {ex.Message}");
                 if (null != ex.StackTrace)
                 {
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine(ex.StackTrace.ToString());
+                    Debugging.WriteLine(ex.StackTrace.ToString());
                 }
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(true, "EXCEPTION");
+                Debugging.TraceMethodExit(true, "EXCEPTION");
                 return null;
             }
 #else
@@ -513,27 +518,27 @@ namespace Karambolo.Extensions.Logging.File
 #if IRL_INCLUDE_EXTENSIONS && (IRL_SPRINT_3_OR_LATER || IRL_SPRINT_4_OR_LATER)
             DateTime dtCreateLogFile = DateTime.UtcNow;
 
-            Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {dtCreateLogFile.ToLocalTime().ToString("O")} equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}] Ticks");
+            Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {dtCreateLogFile.ToLocalTime().ToString("O")} equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}] Ticks");
 
             //
             // In Sprint 4 - This is where we should pull the value from the processor and context..
             //
             dtCreateLogFile = dtCreateLogFile.ToLocalTime();
-            Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodEntry(false, $">> CreateLogFile() - Begin Creating Log File at: {dtCreateLogFile.ToLocalTime()}, equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}]");
+            Debugging.TraceMethodEntry(false, $">> CreateLogFile() - Begin Creating Log File at: {dtCreateLogFile.ToLocalTime()}, equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}]");
 
             // redo this because the tracing method output might be causing a slowdown...
             dtCreateLogFile = DateTime.UtcNow.ToLocalTime();
 
-            Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {dtCreateLogFile.ToLocalTime().ToString("O")} equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}] Ticks");
+            Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {dtCreateLogFile.ToLocalTime().ToString("O")} equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}] Ticks");
 
 #if IRL_SPRINT_4_OR_LATER
             dtCreateLogFile = this.Context.FileLoggerContextCreated.ToLocalTime();
 
-            Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {dtCreateLogFile.ToLocalTime().ToString("O")} equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}] Ticks");
+            Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to {dtCreateLogFile.ToLocalTime().ToString("O")} equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}] Ticks");
 
             DateTime firstCreationDate = fileSettings.GetFileCreationDate();
 
-            Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for firstCreationDate was updated to {firstCreationDate.ToLocalTime().ToString("O")} equal to [0x{firstCreationDate.Ticks.ToString("X8")}] Ticks");
+            Debugging.WriteLine($"DEBUG: Value for firstCreationDate was updated to {firstCreationDate.ToLocalTime().ToString("O")} equal to [0x{firstCreationDate.Ticks.ToString("X8")}] Ticks");
 #endif
 
 #if false && IRL_SPRINT_4_OR_LATER
@@ -542,7 +547,7 @@ namespace Karambolo.Extensions.Logging.File
             // In Sprint 4 - This is where we should pull the value from the processor and context..
             //
             dtCreateLogFile = dtCreateLogFile.ToLocalTime();
-            Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodEntry(false, $">> Begin Creating Log File at: {dtCreateLogFile.ToLocalTime()}, equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}]");
+            Debugging.TraceMethodEntry(false, $">> Begin Creating Log File at: {dtCreateLogFile.ToLocalTime()}, equal to [0x{dtCreateLogFile.Ticks.ToString("X8")}]");
             
             // redo this because the tracing method output might be causing a slowdown...
             dtCreateLogFile = DateTime.UtcNow.ToLocalTime(); 
@@ -552,7 +557,7 @@ namespace Karambolo.Extensions.Logging.File
             //
             LogFileInfo logFile = new LogFileInfo(this, fileSettings, settings);
 
-            Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to [0x{dtCreateLogFile.Ticks.ToString("X8")}] Ticks");
+            Debugging.WriteLine($"DEBUG: Value for dtCreateLogFile was updated to [0x{dtCreateLogFile.Ticks.ToString("X8")}] Ticks");
 
             //
             //
@@ -561,25 +566,25 @@ namespace Karambolo.Extensions.Logging.File
 
             if (lTicksDifference == 0)
             {
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Log File Info Creation Timestamp exactly equals logFile.LogFileCreationTimestamp by [0x{lTicksDifference.ToString("X8")}] Ticks");
+                Debugging.WriteLine($"DEBUG: Log File Info Creation Timestamp exactly equals logFile.LogFileCreationTimestamp by [0x{lTicksDifference.ToString("X8")}] Ticks");
             }
             else if (lTicksDifference > 0)
             {
                 if (lTicksDifference < 20000)
                 {
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"INFORMATION: Log File Info Creation Timestamp only differs from logFile.LogFileCreationTimestamp by [0x{lTicksDifference.ToString("X8")}] Ticks");
+                    Debugging.WriteLine($"INFORMATION: Log File Info Creation Timestamp only differs from logFile.LogFileCreationTimestamp by [0x{lTicksDifference.ToString("X8")}] Ticks");
                 }
                 else
                 {
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"WARNING: Log File Info Creation Timestamp greatly differs from logFile.LogFileCreationTimestamp by [0x{lTicksDifference.ToString("X8")}] Ticks");
+                    Debugging.WriteLine($"WARNING: Log File Info Creation Timestamp greatly differs from logFile.LogFileCreationTimestamp by [0x{lTicksDifference.ToString("X8")}] Ticks");
                 }
             }
             else
             {
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"WARNING: Log File Info Creation Timestamp differs by NEGATIVE TIME from logFile.LogFileCreationTimestamp by [{lTicksDifference.ToString("X8")}] Ticks");
+                Debugging.WriteLine($"WARNING: Log File Info Creation Timestamp differs by NEGATIVE TIME from logFile.LogFileCreationTimestamp by [{lTicksDifference.ToString("X8")}] Ticks");
             }
 
-            Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, $"<< Done Creating Log File Info at: {logFile.LogFileCreationTimestamp.ToLocalTime()}, equal to [0x{logFile.LogFileCreationTimestamp.Ticks.ToString("X8")}]");
+            Debugging.TraceMethodExit(false, $"<< Done Creating Log File Info at: {logFile.LogFileCreationTimestamp.ToLocalTime()}, equal to [0x{logFile.LogFileCreationTimestamp.Ticks.ToString("X8")}]");
 
             return logFile;
 #else
@@ -589,7 +594,7 @@ namespace Karambolo.Extensions.Logging.File
             //
             LogFileInfo logFile = new LogFileInfo(this, fileSettings, settings);
 
-            Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Value for logFile.LogFileCreationTimestamp.ToLocalTime() was updated to [0x{logFile.LogFileCreationTimestamp.Ticks.ToString("X8")}] Ticks");
+            Debugging.WriteLine($"DEBUG: Value for logFile.LogFileCreationTimestamp.ToLocalTime() was updated to [0x{logFile.LogFileCreationTimestamp.Ticks.ToString("X8")}] Ticks");
 
             //
             // Need to break here
@@ -598,25 +603,25 @@ namespace Karambolo.Extensions.Logging.File
 
             if (lTicksDifference == 0)
             {
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Log File Info Creation Timestamp exactly equals logFile.LogFileCreationTimestamp by [0x{lTicksDifference.ToString("X8")}] Ticks");
+                Debugging.WriteLine($"DEBUG: Log File Info Creation Timestamp exactly equals logFile.LogFileCreationTimestamp by [0x{lTicksDifference.ToString("X8")}] Ticks");
             }
             else if (lTicksDifference > 0)
             {
                 if (lTicksDifference < 20000)
                 {
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"INFORMATION: Log File Info Creation Timestamp only differs from logFile.LogFileCreationTimestamp by [0x{lTicksDifference.ToString("X8")}] Ticks");
+                    Debugging.WriteLine($"INFORMATION: Log File Info Creation Timestamp only differs from logFile.LogFileCreationTimestamp by [0x{lTicksDifference.ToString("X8")}] Ticks");
                 }
                 else
                 {
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"WARNING: Log File Info Creation Timestamp greatly differs from logFile.LogFileCreationTimestamp by [0x{lTicksDifference.ToString("X8")}] Ticks");
+                    Debugging.WriteLine($"WARNING: Log File Info Creation Timestamp greatly differs from logFile.LogFileCreationTimestamp by [0x{lTicksDifference.ToString("X8")}] Ticks");
                 }
             }
             else
             {
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"WARNING: Log File Info Creation Timestamp differs by NEGATIVE TIME from logFile.LogFileCreationTimestamp by [{lTicksDifference.ToString("X8")}] Ticks");
+                Debugging.WriteLine($"WARNING: Log File Info Creation Timestamp differs by NEGATIVE TIME from logFile.LogFileCreationTimestamp by [{lTicksDifference.ToString("X8")}] Ticks");
             }
 
-            Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, $"<< CreateLogFile() - Done Creating Log File Info at: {logFile.LogFileCreationTimestamp.ToLocalTime()}, equal to [0x{logFile.LogFileCreationTimestamp.Ticks.ToString("X8")}]");
+            Debugging.TraceMethodExit(false, $"<< CreateLogFile() - Done Creating Log File Info at: {logFile.LogFileCreationTimestamp.ToLocalTime()}, equal to [0x{logFile.LogFileCreationTimestamp.Ticks.ToString("X8")}]");
 
             return logFile;
 #endif
@@ -674,13 +679,13 @@ namespace Karambolo.Extensions.Logging.File
 #if DEBUG
             try
             {
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodEntry(false, "Creating Date Fragment");
+                Debugging.TraceMethodEntry(false, "Creating Date Fragment");
 
                 string szFormat = inlineFormat ?? logFile.DateFormat;
 
                 if (!String.IsNullOrEmpty(szFormat))
                 {
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: String Format Fragment [{szFormat}]");
+                    Debugging.WriteLine($"DEBUG: String Format Fragment [{szFormat}]");
                 }
 
                 //
@@ -690,7 +695,7 @@ namespace Karambolo.Extensions.Logging.File
 
                 if (!String.IsNullOrEmpty(szValue))
                 {
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"INFORMATION: (From LogEntry.TimestampString) Format Result Fragment [{szValue}]");
+                    Debugging.WriteLine($"INFORMATION: (From LogEntry.TimestampString) Format Result Fragment [{szValue}]");
                 }
 
 #if IRL_INCLUDE_EXTENSIONS && IRL_SPRINT_4_OR_LATER
@@ -698,11 +703,11 @@ namespace Karambolo.Extensions.Logging.File
 
                 if (!String.IsNullOrEmpty(szValue2))
                 {
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"INFORMATION: (From LogFile.CreationDate) Format Result Fragment [{szValue2}]");
+                    Debugging.WriteLine($"INFORMATION: (From LogFile.CreationDate) Format Result Fragment [{szValue2}]");
 
                     if (szValue != szValue2)
                     {
-                        Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"ERROR: OVERRIDING LOG ENTRY DATE WITH FILE CREATION DATE) Format Result Fragment [{szValue2}]");
+                        Debugging.WriteLine($"ERROR: OVERRIDING LOG ENTRY DATE WITH FILE CREATION DATE) Format Result Fragment [{szValue2}]");
                         szValue = szValue2;
                     }
                 }
@@ -713,11 +718,11 @@ namespace Karambolo.Extensions.Logging.File
             }
             catch (System.Exception ex)
             {
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"ERROR: Formatting request resulted in a normally unhandled exception");
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"EXCEPTION: {ex.Message}");
+                Debugging.WriteLine($"ERROR: Formatting request resulted in a normally unhandled exception");
+                Debugging.WriteLine($"EXCEPTION: {ex.Message}");
                 if (null != ex.StackTrace)
                 {
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine(ex.StackTrace.ToString());
+                    Debugging.WriteLine(ex.StackTrace.ToString());
                 }
                 szValue = String.Empty;
             }
@@ -727,7 +732,7 @@ namespace Karambolo.Extensions.Logging.File
                 {
                     szValue = String.Empty;
                 }
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, $"Returning Date Fragment [{szValue}]");
+                Debugging.TraceMethodExit(false, $"Returning Date Fragment [{szValue}]");
             }
 #else
             //return  entry.Timestamp.ToLocalTime().ToString(inlineFormat ?? logFile.DateFormat, CultureInfo.InvariantCulture);
@@ -743,30 +748,30 @@ namespace Karambolo.Extensions.Logging.File
 #if DEBUG
             try
             {
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodEntry(false, null);
+                Debugging.TraceMethodEntry(false, null);
 
                 string szFormat = inlineFormat ?? logFile.CounterFormat;
 
                 if (!String.IsNullOrEmpty(szFormat))
                 {
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Format Format Fragment [{szFormat}]");
+                    Debugging.WriteLine($"DEBUG: Format Format Fragment [{szFormat}]");
                 }
 
                 szValue = logFile.Counter.ToString(inlineFormat ?? logFile.CounterFormat, CultureInfo.InvariantCulture);
 
                 if (!String.IsNullOrEmpty(szValue))
                 {
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: String Format Result Fragment [{szValue}]");
+                    Debugging.WriteLine($"DEBUG: String Format Result Fragment [{szValue}]");
                 }
                 return szValue;
             }
             catch (System.Exception ex)
             {
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"ERROR: Formatting request resulted in a normally unhandled exception");
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"EXCEPTION: {ex.Message}");
+                Debugging.WriteLine($"ERROR: Formatting request resulted in a normally unhandled exception");
+                Debugging.WriteLine($"EXCEPTION: {ex.Message}");
                 if (null != ex.StackTrace)
                 {
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine(ex.StackTrace.ToString());
+                    Debugging.WriteLine(ex.StackTrace.ToString());
                 }
                 szValue = String.Empty;
             }
@@ -776,7 +781,7 @@ namespace Karambolo.Extensions.Logging.File
                 {
                     szValue = String.Empty;
                 }
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, $"Returning Counter Fragment [{szValue}]");
+                Debugging.TraceMethodExit(false, $"Returning Counter Fragment [{szValue}]");
             }
 #else
             //return  logFile.Counter.ToString(inlineFormat ?? logFile.CounterFormat, CultureInfo.InvariantCulture);
@@ -792,29 +797,29 @@ namespace Karambolo.Extensions.Logging.File
 #if DEBUG
             try
             {
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodEntry(false, null);
+                Debugging.TraceMethodEntry(false, null);
 
                 string szFormat = inlineFormat ?? logFile.TickCountFormat;
 
                 if (!String.IsNullOrEmpty(szFormat))
                 {
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: Format Format Fragment [{szFormat}]");
+                    Debugging.WriteLine($"DEBUG: Format Format Fragment [{szFormat}]");
                 }
 
                 szValue = logFile.TickCount.ToString(inlineFormat ?? logFile.TickCountFormat, CultureInfo.InvariantCulture);
 
                 if (!String.IsNullOrEmpty(szValue))
                 {
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"DEBUG: String Format Result Fragment [{szValue}]");
+                    Debugging.WriteLine($"DEBUG: String Format Result Fragment [{szValue}]");
                 }
             }
             catch (System.Exception ex)
             {
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"ERROR: Formatting request resulted in a normally unhandled exception");
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"EXCEPTION: {ex.Message}");
+                Debugging.WriteLine($"ERROR: Formatting request resulted in a normally unhandled exception");
+                Debugging.WriteLine($"EXCEPTION: {ex.Message}");
                 if (null != ex.StackTrace)
                 {
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine(ex.StackTrace.ToString());
+                    Debugging.WriteLine(ex.StackTrace.ToString());
                 }
                 szValue = String.Empty;
             }
@@ -824,7 +829,7 @@ namespace Karambolo.Extensions.Logging.File
                 {
                     szValue = String.Empty;
                 }
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(false, $"Returning TickCount Fragment [{szValue}]");
+                Debugging.TraceMethodExit(false, $"Returning TickCount Fragment [{szValue}]");
             }
 #else
             //return logFile.TickCount.ToString(inlineFormat ?? logFile.TickCountFormat, CultureInfo.InvariantCulture);

@@ -1,4 +1,5 @@
 ﻿#define INCLUDE_ILOGGER_EXTENSION_FEATURES
+#define USE_KARAMBOLO_NAMESPACE
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -6,10 +7,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+#if USE_KARAMBOLO_NAMESPACE
+namespace Karambolo.Extensions.Logging.File
+#else
 #if INCLUDE_ILOGGER_EXTENSION_FEATURES
 namespace Intemporal.Experimental.Diagnostics.Logging
 #else
 namespace Intemporal.Experimental.Diagnostics
+#endif
 #endif
 {
     public static class DateTimeFormattingExtensions
@@ -71,8 +76,8 @@ namespace Intemporal.Experimental.Diagnostics
                 fExceptionsHit = true;
 
 #if INCLUDE_ILOGGER_EXTENSION_FEATURES
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"ERROR: Formatting request resulted in a normally unhandled exception");
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"EXCEPTION: {ex.Message}");
+                Debugging.WriteLine($"ERROR: Formatting request resulted in a normally unhandled exception");
+                Debugging.WriteLine($"EXCEPTION: {ex.Message}");
 #else
                 Intemporal.Experimental.Diagnostics.Debugging.WriteLine($"ERROR: Formatting request resulted in a normally unhandled exception");
                 Intemporal.Experimental.Diagnostics.Debugging.WriteLine($"EXCEPTION: {ex.Message}");
@@ -80,7 +85,7 @@ namespace Intemporal.Experimental.Diagnostics
                 if (null != ex.StackTrace)
                 {
 #if INCLUDE_ILOGGER_EXTENSION_FEATURES
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine(ex.StackTrace.ToString());
+                    Debugging.WriteLine(ex.StackTrace.ToString());
 #else
                     Intemporal.Experimental.Diagnostics.Debugging.WriteLine(ex.StackTrace.ToString());
 #endif
@@ -93,7 +98,7 @@ namespace Intemporal.Experimental.Diagnostics
                 if (fExceptionsHit)
                 {
 #if INCLUDE_ILOGGER_EXTENSION_FEATURES
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(fExceptionsHit, $"Extension Method - ToStringHexFullLength() - unable to safely generate hex string from Ticks");
+                    Debugging.TraceMethodExit(fExceptionsHit, $"Extension Method - ToStringHexFullLength() - unable to safely generate hex string from Ticks");
 #else
                     Intemporal.Experimental.Diagnostics.Debugging.TraceMethodExit(fExceptionsHit, $"Extension Method - ToStringHexFullLength() - unable to safely generate hex string from Ticks");
 #endif
@@ -124,8 +129,8 @@ namespace Intemporal.Experimental.Diagnostics
                 fExceptionsHit = true;
 
 #if INCLUDE_ILOGGER_EXTENSION_FEATURES
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"ERROR: Formatting request resulted in a normally unhandled exception");
-                Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine($"EXCEPTION: {ex.Message}");
+                Debugging.WriteLine($"ERROR: Formatting request resulted in a normally unhandled exception");
+                Debugging.WriteLine($"EXCEPTION: {ex.Message}");
 #else
                 Intemporal.Experimental.Diagnostics.Debugging.WriteLine($"ERROR: Formatting request resulted in a normally unhandled exception");
                 Intemporal.Experimental.Diagnostics.Debugging.WriteLine($"EXCEPTION: {ex.Message}");
@@ -133,7 +138,7 @@ namespace Intemporal.Experimental.Diagnostics
                 if (null != ex.StackTrace)
                 {
 #if INCLUDE_ILOGGER_EXTENSION_FEATURES
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.WriteLine(ex.StackTrace.ToString());
+                    Debugging.WriteLine(ex.StackTrace.ToString());
 #else
                     Intemporal.Experimental.Diagnostics.Debugging.WriteLine(ex.StackTrace.ToString());
 #endif
@@ -146,7 +151,7 @@ namespace Intemporal.Experimental.Diagnostics
                 if (fExceptionsHit)
                 {
 #if INCLUDE_ILOGGER_EXTENSION_FEATURES
-                    Intemporal.Experimental.Diagnostics.Logging.Debugging.TraceMethodExit(fExceptionsHit, $"Extension Method - ToStringHexFullLength() - unable to safely generate hex string from Ticks");
+                    Debugging.TraceMethodExit(fExceptionsHit, $"Extension Method - ToStringHexFullLength() - unable to safely generate hex string from Ticks");
 #else
                     Intemporal.Experimental.Diagnostics.Debugging.TraceMethodExit(fExceptionsHit, $"Extension Method - ToStringHexFullLength() - unable to safely generate hex string from Ticks");
 #endif
