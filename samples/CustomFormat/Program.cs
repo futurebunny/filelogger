@@ -1,5 +1,4 @@
-﻿#define DEBUG_INC_TIMESTAMPED_LOGS
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
