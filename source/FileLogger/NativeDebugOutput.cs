@@ -1,9 +1,45 @@
-﻿#define INCLUDE_ILOGGER_EXTENSION_FEATURES
-#define USE_KARAMBOLO_NAMESPACE
-#if false || INCLUDE_FOR_CURRENT_PROJECT
-#if true || INCLUDE_LOW_LEVEL_DEBUG_TRACING
-//#define USE_INTEMPORAL_SYSTEM
-//#define USE_INTEMPORAL_EXPERIMENTAL
+﻿//
+// Only one of the namespace entries should be enabled
+//
+//#define USE_NAMESPACE_EXPERIMENTAL_DIAGNOSTICS
+//#define USE_NAMESPACE_EXPERIMENTAL_DIAGNOSTICS_LOGGING
+//#define USE_NAMESPACE_SYSTEM_DIAGNOSTICS
+//#define USE_NAMESPACE_SYSTEM_DIAGNOSTICS_LOGGING
+#define USE_NAMESPACE_KARAMBOLO
+
+//
+// Use the namespace and project to select certain features and options
+//
+#if USE_NAMESPACE_KARAMBOLO
+//#define INCLUDE_FOR_CURRENT_PROJECT
+#elif (USE_NAMESPACE_EXPERIMENTAL_DIAGNOSTICS || USE_NAMESPACE_SYSTEM_DIAGNOSTICS)
+#define INCLUDE_FOR_CURRENT_PROJECT
+#elif (USE_NAMESPACE_EXPERIMENTAL_DIAGNOSTICS_LOGGING || USE_NAMESPACE_SYSTEM_DIAGNOSTICS_LOGGING)
+#define INCLUDE_FOR_CURRENT_PROJECT
+#define INCLUDE_ILOGGER_EXTENSION_FEATURES
+#endif
+
+//
+// If this is true, the code will be compiled in, otherwise stubbed out
+//
+#if INCLUDE_FOR_CURRENT_PROJECT
+#define ENABLE_DEBUGGING_CONFIGURATION
+#define ENABLE_DEBUGGING_CONTEXT
+#define ENABLE_HISTORICAL_TRACE_LISTENER
+#define ADD_TIMESTAMP_TO_TRACE_OUTPUT
+#define CHECK_LEGACY_MANAGED_TRACE_LISTENERS
+#define CAPTURE_CONTEXT_CREATION
+#define TEST_CODE_FOR_LOG_FILE_NAME
+#define QUERY_CONFIGURATION_FOR_LOG_FILE_NAME
+#define CAPTURE_APPLICATION_EXECUTABLE_CONTEXT
+//#define USE_NATIVE_OUTPUT_DEBUG_STRING
+#define SAVE_LEGACY_TRACE_OUTPUT_TO_FILE
+#define INCLUDE_LOW_LEVEL_DEBUG_TRACING
+#define INCLUDE_FOR_CURRENT_PROJECT
+#endif
+
+
+#if INCLUDE_FOR_CURRENT_PROJECT
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,41 +50,39 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
 
+
 #if INCLUDE_ILOGGER_EXTENSION_FEATURES
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 #endif
 
-#if USE_KARAMBOLO_NAMESPACE
+
+#if USE_NAMESPACE_KARAMBOLO
 namespace Karambolo.Extensions.Logging.File
-#else
-#if USE_INTEMPORAL_SYSTEM
-//namespace Intemporal.System.Diagnostix
-namespace Intemporal.Experimental.Diagnostics.Logging
-#elif USE_INTEMPORAL_EXPERIMENTAL
-//namespace Intemporal.Experimental.Diagnostics.NativeMethods
-#if INCLUDE_ILOGGER_EXTENSION_FEATURES
-namespace Intemporal.Experimental.Diagnostics.Logging
-#else
+#elif USE_NAMESPACE_EXPERIMENTAL_DIAGNOSTICS
 namespace Intemporal.Experimental.Diagnostics
-#endif
-#endif
+#elif USE_NAMESPACE_SYSTEM_DIAGNOSTICS
+namespace Intemporal.System.Diagnostics
+#elif USE_NAMESPACE_EXPERIMENTAL_DIAGNOSTICS_LOGGING
+namespace Intemporal.Experimental.Diagnostics.Logging
+#elif USE_NAMESPACE_SYSTEM_DIAGNOSTICS_LOGGING
+namespace Intemporal.System.Diagnostics
 #endif
 {
 
     public static class Debugging
     {
-#if true || ENABLE_DEBUGGING_CONFIGURATION
+#if ENABLE_DEBUGGING_CONFIGURATION
         // maybe make this a singleton?
         public static DebuggingConfiguration? CurrentConfig = null;
 #endif
 
-#if true || ENABLE_DEBUGGING_CONTEXT
+#if ENABLE_DEBUGGING_CONTEXT
         // maybe make this a singleton?
         public static DebuggingContext? CurrentContext = null;
 
-#if true || ENABLE_HISTORICAL_TRACE_LISTENER
+#if ENABLE_HISTORICAL_TRACE_LISTENER
         public static System.Diagnostics.TextWriterTraceListener? LegacyTraceListener = null;
 #endif
 
@@ -58,7 +92,7 @@ namespace Intemporal.Experimental.Diagnostics
         // To be used to set global configuration options for legacy tracing...
         // TODO: ==> make this work with the new .NET Core loading of options and configuration data...
         //
-#if true || ENABLE_DEBUGGING_CONFIGURATION
+#if ENABLE_DEBUGGING_CONFIGURATION
         public struct DebuggingConfiguration
         {
             public DateTime? dtAppTimeStamp { get; set; }
@@ -86,7 +120,7 @@ namespace Intemporal.Experimental.Diagnostics
         //
         // To be used to grab the name of a hosted service...
         //
-#if true || ENABLE_DEBUGGING_CONTEXT
+#if ENABLE_DEBUGGING_CONTEXT
         public struct DebuggingContext
         {
             public DateTime? dtAppTimeStamp { get; set; }
@@ -180,7 +214,7 @@ namespace Intemporal.Experimental.Diagnostics
 
             if (!String.IsNullOrEmpty(message))
             {
-#if true || ADD_TIMESTAMP_TO_TRACE_OUTPUT
+#if ADD_TIMESTAMP_TO_TRACE_OUTPUT
                 //
                 // Yuck, it's late and I just want to see if this timestamping works... but OMG this shit must generate gigabytes and beyond of GC garbage from all this string bullshit...
                 //
@@ -196,7 +230,8 @@ namespace Intemporal.Experimental.Diagnostics
                 // Consider if this should check for any registered trace listeners... and default to Native mode if none are available...
                 //
                 bool? fManagedListenersAvailable = null;
-#if true || CHECK_LEGACY_MANAGED_TRACE_LISTENERS
+
+#if CHECK_LEGACY_MANAGED_TRACE_LISTENERS
                 try
                 {
                     int iActiveListeners = System.Diagnostics.Trace.Listeners.Count;
@@ -268,7 +303,7 @@ namespace Intemporal.Experimental.Diagnostics
         {
             DateTime dtAppTimeStamp = DateTime.UtcNow;
 
-#if true || CAPTURE_CONTEXT_CREATION
+#if CAPTURE_CONTEXT_CREATION
             Debugging.TraceMethodEntry(false, $">> Starting GetDebuggingConfiguration() at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
 #endif
 
@@ -283,7 +318,7 @@ namespace Intemporal.Experimental.Diagnostics
 
             debuggingConfiguration.dtAppTimeStamp = dtAppTimeStamp;
 
-#if true || CAPTURE_CONTEXT_CREATION
+#if CAPTURE_CONTEXT_CREATION
             Debugging.TraceMethodExit(false, $"<< Finishing GetDebuggingConfiguration()  at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
 #endif
             return debuggingConfiguration;
@@ -296,7 +331,7 @@ namespace Intemporal.Experimental.Diagnostics
         {
             DateTime dtAppTimeStamp = DateTime.UtcNow;
 
-#if true || CAPTURE_CONTEXT_CREATION
+#if CAPTURE_CONTEXT_CREATION
             Debugging.TraceMethodEntry(false, $">> Starting GetDebuggingContext() at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
 #endif
 
@@ -403,7 +438,7 @@ namespace Intemporal.Experimental.Diagnostics
             }
 
 
-#if true || CAPTURE_CONTEXT_CREATION
+#if CAPTURE_CONTEXT_CREATION
             dtAppTimeStamp = DateTime.UtcNow;
 
             Debugging.TraceMethodExit(false, $"<< Finishing GetDebuggingContext()  at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
@@ -419,12 +454,12 @@ namespace Intemporal.Experimental.Diagnostics
         {
             DateTime dtAppTimeStamp = DateTime.UtcNow;
 
-#if true || CAPTURE_WORKER_CREATION
+#if CAPTURE_WORKER_CREATION
             Debugging.TraceMethodEntry(false, $">> Starting TraceCreateLogFileWriter()  at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
 #endif
 
             bool fLogFileNameCreated = false;
-#if true || TEST_CODE_FOR_LOG_FILE_NAME
+#if TEST_CODE_FOR_LOG_FILE_NAME
             //
             // Generate Log File Name: e.g. "RegistryServerApp--dt2022-04-02--00-22-20--TickCount[8DA143ED9C9F04E]--TraceListener.log.txt"
             //
@@ -445,7 +480,7 @@ namespace Intemporal.Experimental.Diagnostics
             Debugging.WriteLine($"INFORMATION: Example => TraceWriter target filename would be [{szTraceFileExecutingAppName}] at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
 #endif
 
-#if true || QUERY_CONFIGURATION_FOR_LOG_FILE_NAME
+#if QUERY_CONFIGURATION_FOR_LOG_FILE_NAME
             //
             // Note, this should return a new or existing configuration object...
             //
@@ -487,7 +522,7 @@ namespace Intemporal.Experimental.Diagnostics
 #endif
 
 
-#if true || CAPTURE_APPLICATION_EXECUTABLE_CONTEXT
+#if CAPTURE_APPLICATION_EXECUTABLE_CONTEXT
             if (String.IsNullOrEmpty(szTraceFileName) || !fLogFileNameCreated)
             {
                 //
@@ -556,7 +591,7 @@ namespace Intemporal.Experimental.Diagnostics
 
             dtAppTimeStamp = DateTime.UtcNow;
 
-#if true || CAPTURE_CONTEXT_CREATION
+#if CAPTURE_CONTEXT_CREATION
             Debugging.TraceMethodExit(false, $"<< Finishing TraceCreateLogFileWriter()  at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
 #endif
 
@@ -567,7 +602,7 @@ namespace Intemporal.Experimental.Diagnostics
         {
             DateTime dtAppTimeStamp = DateTime.UtcNow;
 
-#if true || CAPTURE_WORKER_CREATION
+#if CAPTURE_WORKER_CREATION
             Debugging.TraceMethodEntry(false, $">> Starting SaveTraceToLogFile() at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
 #endif
 
@@ -592,7 +627,7 @@ namespace Intemporal.Experimental.Diagnostics
             bool s_fAddTraceListerToLogger = (Debugging.LegacyTraceListener != null);
             System.Diagnostics.TextWriterTraceListener twTraceListener;
 
-#if true || SAVE_LEGACY_TRACE_OUTPUT_TO_FILE
+#if SAVE_LEGACY_TRACE_OUTPUT_TO_FILE
 
             if (Debugging.LegacyTraceListener != null)
             {
@@ -639,7 +674,7 @@ namespace Intemporal.Experimental.Diagnostics
 
             dtAppTimeStamp = DateTime.UtcNow;
 
-#if true || CAPTURE_CONTEXT_CREATION
+#if CAPTURE_CONTEXT_CREATION
             Debugging.TraceMethodExit(false, $"<< Finishing SaveTraceToLogFile() at: {dtAppTimeStamp.ToStringLocalInvariant()}, equal to [0x{dtAppTimeStamp.ToStringHexFullLength()}]");
 #endif
 
@@ -729,101 +764,36 @@ namespace Intemporal.Experimental.Diagnostics
 
     }
 }
-
 #else
-#undef USE_INTEMPORAL_SYSTEM
-#define USE_INTEMPORAL_EXPERIMENTAL
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-
-#if USE_INTEMPORAL_SYSTEM
-//namespace Intemporal.System.Diagnostix
-namespace Intemporal.Experimental.Diagnostics.Logging
-#elif USE_INTEMPORAL_EXPERIMENTAL
-namespace Intemporal.Experimental.Diagnostics.NativeMethods
-#endif
-{
-    public class NativeWin32
-    {
-#if true || USE_NATIVE
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
-        public static extern void OutputDebugString(string message);
-#else
-        private static int m_totalCalls = 0;
-        private static int m_recursionCount = 0;
-
-        public static void OutputDebugString(string message)
-        {
-            int count = Interlocked.Increment(ref m_recursionCount);
-
-            int totalCalls = Interlocked.Increment(ref m_totalCalls);
-
-            if (count > 10)
-            {
-                //Intemporal.Experimental.Diagnostics.NativeMethods.NativeWin32.OutputDebugString($"TRACE: {nameof(TraceListenerToLogger)}.WriteLine(string?) with Instance {iHashCode} has {count} recursions");
-                throw new InvalidOperationException($"TRACE: {nameof(NativeWin32)}.OutputDebugString(string?) has too many recursions={count}");
-            }
-
-            System.Diagnostics.Trace.WriteLine(message);
-
-            count = Interlocked.Decrement(ref m_recursionCount);
-
-            //Intemporal.Experimental.Diagnostics.NativeMethods.NativeWin32.OutputDebugString($"TRACE: {nameof(TraceListenerToLogger)}.WriteLine(string?) with Instance {iHashCode} has {count} recursions");
-
-            if (count < 0)
-            {
-                //Intemporal.Experimental.Diagnostics.NativeMethods.NativeWin32.OutputDebugString($"TRACE: {nameof(TraceListenerToLogger)}.WriteLine(string?) with Instance {iHashCode} has {count} recursions");
-                throw new InvalidOperationException($"TRACE: {nameof(NativeWin32)}.OutputDebugString(string?) has too few recursions={count}");
-            }
-
-        }
-#endif
-
-    }
-
-    //namespace OutputDebugString
-    //{
-    //    class Program
-    //    {
-
-    //        static void Main(string[] args)
-    //        {
-    //            Console.WriteLine("Main - Enter - Console.WriteLine");
-    //            Debug.WriteLine("Main - Enter - Debug.WriteLine");
-    //            OutputDebugString("Main - Enter - OutputDebugString");
-    //            OutputDebugString("Main - Exit - OutputDebugString");
-    //            Debug.WriteLine("Main - Exit - Debug.WriteLine");
-    //            Console.WriteLine("Main - Exit - Console.WriteLine");
-    //        }
-    //    }
-    //}
-
-}
-#endif
-#else
-#if USE_KARAMBOLO_NAMESPACE
+//
+// This section contains the namespace and class and function stubbs
+//
+#if USE_NAMESPACE_KARAMBOLO
 namespace Karambolo.Extensions.Logging.File
-#else
+#elif USE_NAMESPACE_EXPERIMENTAL_DIAGNOSTICS
+namespace Intemporal.Experimental.Diagnostics
+#elif USE_NAMESPACE_SYSTEM_DIAGNOSTICS
+namespace Intemporal.System.Diagnostics
+#elif USE_NAMESPACE_EXPERIMENTAL_DIAGNOSTICS_LOGGING
 namespace Intemporal.Experimental.Diagnostics.Logging
+#elif USE_NAMESPACE_SYSTEM_DIAGNOSTICS_LOGGING
+namespace Intemporal.System.Diagnostics
 #endif
 {
-#if USE_KARAMBOLO_NAMESPACE
+#if USE_NAMESPACE_KARAMBOLO
     internal static class Debugging
-#else
+#elif (USE_NAMESPACE_EXPERIMENTAL_DIAGNOSTICS || USE_NAMESPACE_SYSTEM_DIAGNOSTICS || USE_NAMESPACE_EXPERIMENTAL_DIAGNOSTICS_LOGGING || USE_NAMESPACE_SYSTEM_DIAGNOSTICS_LOGGING)
     public static class Debugging
 #endif
     {
         public static void WriteLine(string? message)
         {
+#if DEBUG
+            if (null != message)
+            {
+                System.Diagnostics.Debug.WriteLine(message);
+            }
+#endif
         }
         public static void TraceMethodEntry(bool fVerbose, string? message)
         {
@@ -831,7 +801,6 @@ namespace Intemporal.Experimental.Diagnostics.Logging
         public static void TraceMethodExit(bool fVerbose, string? message)
         {
         }
-
     }
 }
 #endif
